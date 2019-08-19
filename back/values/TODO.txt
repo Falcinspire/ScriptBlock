@@ -1,0 +1,2 @@
+Make visitor for values
+Compiler will use that to 'stringify' things and expand functions as necessary

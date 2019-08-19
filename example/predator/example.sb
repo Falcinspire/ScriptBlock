@@ -1,0 +1,39 @@
+import predator:helper
+
+const sub = 6
+const add = sub * 3
+
+/*
+** This is a documentation string
+*/
+#minecraft:tick func do_load { 
+    command('rip')
+}
+
+func do_something {
+    test_wrap(5)
+}
+
+script test_wrap { (z) ->
+    command(z)
+    test_scopes { (a, b) ->
+        command('say', a, b)
+        test_scopes { (c, d) ->
+            command('say', c, d, z, a)
+        }
+    }
+    test_scopes { (a, b) ->
+        command('say', a, b)
+    }
+    test_scopes { (a, b) ->
+        command('say', a, b)
+    }
+
+    delay [10] {
+        command('say', 'arg')
+    }
+}
+
+script test_scopes { (toRun) ->
+    toRun(1, 2)
+}

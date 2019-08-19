@@ -1,0 +1,15 @@
+package location
+
+import (
+	"fmt"
+	"strings"
+)
+
+func InformalPath(location *UnitLocation) string {
+	return fmt.Sprintf("%s:%s", location.Module, location.Unit)
+}
+
+func LocationFromInformal(path string) *UnitLocation {
+	data := strings.Split(path, ":")
+	return NewUnitLocation(data[0], data[1])
+}

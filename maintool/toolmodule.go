@@ -1,0 +1,127 @@
+package maintool
+
+import (
+	"io/ioutil"
+	"path/filepath"
+	"strings"
+
+	"github.com/sirupsen/logrus"
+
+	"github.com/falcinspire/scriptblock/back/evaluator"
+	"github.com/falcinspire/scriptblock/back/tags"
+	"github.com/falcinspire/scriptblock/front/astgen"
+	"github.com/falcinspire/scriptblock/front/parser"
+
+	"github.com/falcinspire/scriptblock/back/values"
+	"github.com/falcinspire/scriptblock/front/addressbook"
+	"github.com/falcinspire/scriptblock/front/astbook"
+	"github.com/falcinspire/scriptblock/front/dependency"
+	"github.com/falcinspire/scriptblock/front/imports"
+	"github.com/falcinspire/scriptblock/front/location"
+	"github.com/falcinspire/scriptblock/front/symbols"
+)
+
+func DoModule(path string, output evaluator.OutputDirectory) {
+
+	// this could be dangerous if given wrong directory
+	// if _, err := os.Stat(output); !os.IsNotExist(err) {
+	// 	os.RemoveAll(output)
+	// 	os.MkdirAll(output, os.ModePerm)
+	// }
+
+	moduleFolder := filepath.Base(path)
+
+	logrus.WithFields(logrus.Fields{
+		"module": moduleFolder,
+	}).Info("compiling module")
+
+	files, err := ioutil.ReadDir(path)
+	if err != nil {
+		panic(err)
+	}
+
+	locations := make([]*location.UnitLocation, len(files))
+
+	// find locations
+	for i, file := range files {
+		unitName := strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
+		locations[i] = location.NewUnitLocation(moduleFolder, unitName)
+
+		logrus.WithFields(logrus.Fields{
+			"module": moduleFolder,
+			"unit":   unitName,
+		}).Info("identified unit")
+	}
+
+	// read asts
+	astbooko := astbook.NewAstBook()
+	for _, unitlocation := range locations {
+		pstree := parser.Parse(unitlocation)
+		astree := astgen.PSTtoAST(pstree)
+		astbook.InsertAst(unitlocation, astree, astbooko)
+
+		logrus.WithFields(logrus.Fields{
+			"module": unitlocation.Module,
+			"unit":   unitlocation.Unit,
+		}).Info("ast produced")
+	}
+
+	// read imports
+	importbook := imports.NewImportBook()
+	for _, unitlocation := range locations {
+		astree := astbook.LookupAst(unitlocation, astbooko)
+		importList := imports.TakeImports(astree)
+		imports.InsertImportList(unitlocation.Module, unitlocation.Unit, importList, importbook)
+
+		importListString := make([]string, len(importList))
+		for i, importLine := range importList {
+			importListString[i] = location.InformalPath(importLine)
+		}
+		logrus.WithFields(logrus.Fields{
+			"module":  unitlocation.Module,
+			"unit":    unitlocation.Unit,
+			"imports": importListString,
+		}).Info("imports taken")
+	}
+
+	dependencyGraph := dependency.NewDependencyGraph()
+	// insert nodes
+	for _, unitlocation := range locations {
+		informalPath := location.InformalPath(unitlocation)
+		dependency.InsertNode(informalPath, dependencyGraph)
+	}
+	// connect nodes
+	for _, unitLocation := range locations {
+		importList := imports.LookupImportList(unitLocation.Module, unitLocation.Unit, importbook)
+		informalDependent := location.InformalPath(unitLocation)
+		for _, importLine := range importList {
+			informalDependency := location.InformalPath(importLine)
+			dependency.AddDependency(informalDependent, informalDependency, dependencyGraph)
+		}
+	}
+
+	// generate resolution path
+	order := dependency.MakeDependencyOrder(location.InformalPath(locations[0]), dependencyGraph)
+
+	logrus.WithFields(logrus.Fields{
+		"order": order,
+	}).Info("dependency order produced")
+
+	symbollibrary := symbols.NewSymbolLibrary()
+	valuelibrary := values.NewValueLibrary()
+	addressbooko := addressbook.NewAddressBook()
+
+	theTags := make(map[string]tags.LocationList)
+
+	for _, informalLocation := range order {
+		unitLocation := location.LocationFromInformal(informalLocation)
+		DoUnit(unitLocation, astbooko, importbook, symbollibrary, valuelibrary, addressbooko, theTags, output)
+
+		logrus.WithFields(logrus.Fields{
+			"module": unitLocation.Module,
+			"unit":   unitLocation.Unit,
+		}).Info("compiled unit")
+	}
+
+	tags.WriteTags(theTags, output)
+}
