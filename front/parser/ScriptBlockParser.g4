@@ -29,10 +29,15 @@ statement
 : (functionCall NEWLINES) #functionCallStatement
 | (nativeCall NEWLINES) #nativeCallStatement
 | (delayStructure NEWLINES) #delayStructureStatement
+| (raise NEWLINES) #raiseStatement
 ;
 
 delayStructure
 : DELAY structureList functionFrame
+;
+
+raise
+: RAISE tag
 ;
 
 expression

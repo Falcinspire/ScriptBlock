@@ -51,6 +51,9 @@ func (visitor *BaseStatementVisitor) VisitNativeCall(nativeCall *NativeCall) {}
 // VisitDelay is the double dispatch for delay statements that does nothing by default
 func (visitor *BaseStatementVisitor) VisitDelay(delay *DelayStatement) {}
 
+// VisitRaise is the double dispatch for raise statements that does nothing by default
+func (visitor *BaseStatementVisitor) VisitRaise(delay *RaiseStatement) {}
+
 // BaseTopVisitor is the visitor for top definitions that does nothing by default
 type BaseTopVisitor struct{}
 

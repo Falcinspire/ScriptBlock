@@ -32,6 +32,8 @@ script test_wrap { (z) ->
     delay [10] {
         command('say', 'arg')
     }
+
+    raise #minecraft:tick
 }
 
 script test_scopes { (toRun) ->

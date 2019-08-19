@@ -36,6 +36,8 @@ type StatementVisitor interface {
 	VisitNativeCall(nativeCall *NativeCall)
 	// VisitDelay is the double dispatch for delay statements
 	VisitDelay(delay *DelayStatement)
+	// VisitRaise is the double dispatch for raise statements
+	VisitRaise(delay *RaiseStatement)
 }
 
 // TopVisitor is the visitor for top definitions

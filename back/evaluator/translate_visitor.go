@@ -50,3 +50,6 @@ func (visitor *TranslateStatementVisitor) VisitDelay(delay *ast.DelayStatement) 
 	visitor.data.LoopInject.InjectBody = append(visitor.data.LoopInject.InjectBody, testCloud)
 	visitor.Lines = []string{summonCloud}
 }
+func (visitor *TranslateStatementVisitor) VisitRaise(raise *ast.RaiseStatement) {
+	visitor.Lines = []string{fmt.Sprintf("function #%s:%s\n", raise.Tag.Namespace, raise.Tag.Identity)}
+}

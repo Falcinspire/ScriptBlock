@@ -74,8 +74,14 @@ type ScriptBlockParserListener interface {
 	// EnterDelayStructureStatement is called when entering the delayStructureStatement production.
 	EnterDelayStructureStatement(c *DelayStructureStatementContext)
 
+	// EnterRaiseStatement is called when entering the raiseStatement production.
+	EnterRaiseStatement(c *RaiseStatementContext)
+
 	// EnterDelayStructure is called when entering the delayStructure production.
 	EnterDelayStructure(c *DelayStructureContext)
+
+	// EnterRaise is called when entering the raise production.
+	EnterRaise(c *RaiseContext)
 
 	// EnterStringExpr is called when entering the stringExpr production.
 	EnterStringExpr(c *StringExprContext)
@@ -182,8 +188,14 @@ type ScriptBlockParserListener interface {
 	// ExitDelayStructureStatement is called when exiting the delayStructureStatement production.
 	ExitDelayStructureStatement(c *DelayStructureStatementContext)
 
+	// ExitRaiseStatement is called when exiting the raiseStatement production.
+	ExitRaiseStatement(c *RaiseStatementContext)
+
 	// ExitDelayStructure is called when exiting the delayStructure production.
 	ExitDelayStructure(c *DelayStructureContext)
+
+	// ExitRaise is called when exiting the raise production.
+	ExitRaise(c *RaiseContext)
 
 	// ExitStringExpr is called when exiting the stringExpr production.
 	ExitStringExpr(c *StringExprContext)

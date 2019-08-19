@@ -161,11 +161,23 @@ func (s *BaseScriptBlockParserListener) EnterDelayStructureStatement(ctx *DelayS
 func (s *BaseScriptBlockParserListener) ExitDelayStructureStatement(ctx *DelayStructureStatementContext) {
 }
 
+// EnterRaiseStatement is called when production raiseStatement is entered.
+func (s *BaseScriptBlockParserListener) EnterRaiseStatement(ctx *RaiseStatementContext) {}
+
+// ExitRaiseStatement is called when production raiseStatement is exited.
+func (s *BaseScriptBlockParserListener) ExitRaiseStatement(ctx *RaiseStatementContext) {}
+
 // EnterDelayStructure is called when production delayStructure is entered.
 func (s *BaseScriptBlockParserListener) EnterDelayStructure(ctx *DelayStructureContext) {}
 
 // ExitDelayStructure is called when production delayStructure is exited.
 func (s *BaseScriptBlockParserListener) ExitDelayStructure(ctx *DelayStructureContext) {}
+
+// EnterRaise is called when production raise is entered.
+func (s *BaseScriptBlockParserListener) EnterRaise(ctx *RaiseContext) {}
+
+// ExitRaise is called when production raise is exited.
+func (s *BaseScriptBlockParserListener) ExitRaise(ctx *RaiseContext) {}
 
 // EnterStringExpr is called when production stringExpr is entered.
 func (s *BaseScriptBlockParserListener) EnterStringExpr(ctx *StringExprContext) {}

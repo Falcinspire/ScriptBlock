@@ -129,6 +129,15 @@ func (visitor *statementConvertVisitor) EnterDelayStructureStatement(ictx *parse
 	visitor.Statement = ast.NewDelayStatement(delay, body.Body)
 }
 
+// EnterFunctionCallStatement is the visitor enter method for function call statements.
+func (visitor *statementConvertVisitor) EnterRaiseStatement(lctx *parser.RaiseStatementContext) {
+	ctx := lctx.Raise().(*parser.RaiseContext)
+	identifierContexts := ctx.Tag().(*parser.TagContext).AllIDENTIFIER()
+	tag := convertTag(identifierContexts)
+
+	visitor.Statement = ast.NewRaiseStatement(tag)
+}
+
 //TODO maybe merge these?
 func (visitor *expressionConvertVisitor) QuickVisitArgumentList(list parser.IArgumentListContext) []ast.Expression {
 	expressionsContext := list.(*parser.ArgumentListContext).AllExpression()

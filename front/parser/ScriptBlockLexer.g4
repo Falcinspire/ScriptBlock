@@ -20,6 +20,7 @@ NATIVE: 'command';
 CONSTANT: 'const';
 
 RUN: 'run';
+RAISE: 'raise';
 
 DELAY: 'delay';
 

@@ -61,3 +61,16 @@ func NewDelayStatement(tickDelay Expression, body []Statement) *DelayStatement {
 func (statement *DelayStatement) Accept(visitor StatementVisitor) {
 	visitor.VisitDelay(statement)
 }
+
+type RaiseStatement struct {
+	Tag Tag
+}
+
+func NewRaiseStatement(tag Tag) *RaiseStatement {
+	return &RaiseStatement{tag}
+}
+
+// Accept runs the double dispatch for the visitor
+func (statement *RaiseStatement) Accept(visitor StatementVisitor) {
+	visitor.VisitRaise(statement)
+}
