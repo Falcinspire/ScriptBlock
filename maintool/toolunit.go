@@ -10,7 +10,6 @@ import (
 	"github.com/falcinspire/scriptblock/front/astbook"
 	"github.com/falcinspire/scriptblock/front/imports"
 	"github.com/falcinspire/scriptblock/front/location"
-	"github.com/falcinspire/scriptblock/front/pretty"
 	"github.com/falcinspire/scriptblock/front/resolver"
 	"github.com/falcinspire/scriptblock/front/symbolgen"
 	"github.com/falcinspire/scriptblock/front/symbols"
@@ -22,11 +21,7 @@ func DoUnit(unitLocation *location.UnitLocation, astbooko astbook.AstBook, impor
 	symbolgen.SymbolsPass(astree, unitLocation, symbollibrary)
 	resolver.ResolvePass(astree, unitLocation, symbollibrary, importbook)
 
-	pretty.PrintResolved(astree)
-
 	// back end
 	desugar.DesugarUnit(astree, unitLocation)
-
-	// pretty.PrintResolved(astree)
 	valuepass.ValuePass(astree, unitLocation, valuelibrary, addressbook, theTags, output)
 }

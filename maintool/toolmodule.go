@@ -2,6 +2,7 @@ package maintool
 
 import (
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -40,68 +41,10 @@ func DoModule(path string, output evaluator.OutputDirectory) {
 		panic(err)
 	}
 
-	locations := make([]*location.UnitLocation, len(files))
-
-	// find locations
-	for i, file := range files {
-		unitName := strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
-		locations[i] = location.NewUnitLocation(moduleFolder, unitName)
-
-		logrus.WithFields(logrus.Fields{
-			"module": moduleFolder,
-			"unit":   unitName,
-		}).Info("identified unit")
-	}
-
-	// read asts
-	astbooko := astbook.NewAstBook()
-	for _, unitlocation := range locations {
-		pstree := parser.Parse(unitlocation)
-		astree := astgen.PSTtoAST(pstree)
-		astbook.InsertAst(unitlocation, astree, astbooko)
-
-		logrus.WithFields(logrus.Fields{
-			"module": unitlocation.Module,
-			"unit":   unitlocation.Unit,
-		}).Info("ast produced")
-	}
-
-	// read imports
-	importbook := imports.NewImportBook()
-	for _, unitlocation := range locations {
-		astree := astbook.LookupAst(unitlocation, astbooko)
-		importList := imports.TakeImports(astree)
-		imports.InsertImportList(unitlocation.Module, unitlocation.Unit, importList, importbook)
-
-		importListString := make([]string, len(importList))
-		for i, importLine := range importList {
-			importListString[i] = location.InformalPath(importLine)
-		}
-		logrus.WithFields(logrus.Fields{
-			"module":  unitlocation.Module,
-			"unit":    unitlocation.Unit,
-			"imports": importListString,
-		}).Info("imports taken")
-	}
-
-	dependencyGraph := dependency.NewDependencyGraph()
-	// insert nodes
-	for _, unitlocation := range locations {
-		informalPath := location.InformalPath(unitlocation)
-		dependency.InsertNode(informalPath, dependencyGraph)
-	}
-	// connect nodes
-	for _, unitLocation := range locations {
-		importList := imports.LookupImportList(unitLocation.Module, unitLocation.Unit, importbook)
-		informalDependent := location.InformalPath(unitLocation)
-		for _, importLine := range importList {
-			informalDependency := location.InformalPath(importLine)
-			dependency.AddDependency(informalDependent, informalDependency, dependencyGraph)
-		}
-	}
-
-	// generate resolution path
-	order := dependency.MakeDependencyOrder(location.InformalPath(locations[0]), dependencyGraph)
+	locations := registerLocations(files, moduleFolder)
+	astbooko := parseAllToAsts(locations)
+	importbooko := takeImportsFromAsts(astbooko, locations)
+	order := makeDependencyOrder(locations, importbooko)
 
 	logrus.WithFields(logrus.Fields{
 		"order": order,
@@ -115,7 +58,7 @@ func DoModule(path string, output evaluator.OutputDirectory) {
 
 	for _, informalLocation := range order {
 		unitLocation := location.LocationFromInformal(informalLocation)
-		DoUnit(unitLocation, astbooko, importbook, symbollibrary, valuelibrary, addressbooko, theTags, output)
+		DoUnit(unitLocation, astbooko, importbooko, symbollibrary, valuelibrary, addressbooko, theTags, output)
 
 		logrus.WithFields(logrus.Fields{
 			"module": unitLocation.Module,
@@ -124,4 +67,75 @@ func DoModule(path string, output evaluator.OutputDirectory) {
 	}
 
 	tags.WriteTags(theTags, output)
+}
+
+func registerLocations(files []os.FileInfo, moduleFolder string) []*location.UnitLocation {
+	locations := make([]*location.UnitLocation, len(files))
+
+	for i, file := range files {
+		unitName := strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
+		locations[i] = location.NewUnitLocation(moduleFolder, unitName)
+
+		logrus.WithFields(logrus.Fields{
+			"module": moduleFolder,
+			"unit":   unitName,
+		}).Info("identified unit")
+	}
+
+	return locations
+}
+
+func parseAllToAsts(locations []*location.UnitLocation) astbook.AstBook {
+	astbooko := astbook.NewAstBook()
+	for _, unitlocation := range locations {
+		pstree := parser.Parse(unitlocation)
+		astree := astgen.PSTtoAST(pstree)
+		astbook.InsertAst(unitlocation, astree, astbooko)
+
+		logrus.WithFields(logrus.Fields{
+			"module": unitlocation.Module,
+			"unit":   unitlocation.Unit,
+		}).Info("ast produced")
+	}
+	return astbooko
+}
+
+func takeImportsFromAsts(astbooko astbook.AstBook, locations []*location.UnitLocation) imports.ImportBook {
+	importbooko := imports.NewImportBook()
+	for _, unitlocation := range locations {
+		astree := astbook.LookupAst(unitlocation, astbooko)
+		importList := imports.TakeImports(astree)
+		imports.InsertImportList(unitlocation.Module, unitlocation.Unit, importList, importbooko)
+
+		importListString := make([]string, len(importList))
+		for i, importLine := range importList {
+			importListString[i] = location.InformalPath(importLine)
+		}
+		logrus.WithFields(logrus.Fields{
+			"module":  unitlocation.Module,
+			"unit":    unitlocation.Unit,
+			"imports": importListString,
+		}).Info("imports taken")
+	}
+	return importbooko
+}
+
+func makeDependencyOrder(locations []*location.UnitLocation, importbooko imports.ImportBook) []string {
+	dependencyGraph := dependency.NewDependencyGraph()
+	// insert nodes
+	for _, unitlocation := range locations {
+		informalPath := location.InformalPath(unitlocation)
+		dependency.InsertNode(informalPath, dependencyGraph)
+	}
+	// connect nodes
+	for _, unitLocation := range locations {
+		importList := imports.LookupImportList(unitLocation.Module, unitLocation.Unit, importbooko)
+		informalDependent := location.InformalPath(unitLocation)
+		for _, importLine := range importList {
+			informalDependency := location.InformalPath(importLine)
+			dependency.AddDependency(informalDependent, informalDependency, dependencyGraph)
+		}
+	}
+
+	return dependency.MakeDependencyOrder(location.InformalPath(locations[0]), dependencyGraph)
 }
