@@ -25,7 +25,7 @@ func GenerateTickFunction(inject *LoopInject, unitLocation *location.UnitLocatio
 
 func GenerateDelayLines(inject *LoopInject, delay int, functionCall *ast.FunctionCall, data *EvaluateData) (runCommand string) {
 	cloudID := uuid.New().String()
-	invokeValue := ReduceExpression(ast.NewCallExpression(functionCall.Callee, functionCall.Arguments), data)
+	invokeValue := ReduceExpression(ast.NewCallExpression(functionCall.Callee, functionCall.Arguments, nil), data)
 	translateValue := RawifyValue(invokeValue)
 	testCloud := fmt.Sprintf("execute as @e[type=minecraft:area_effect_cloud,tag=%s,nbt={Age:%d}] run %s", cloudID, delay, translateValue)
 	inject.InjectBody = append(inject.InjectBody, testCloud)

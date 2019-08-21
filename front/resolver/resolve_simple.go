@@ -40,7 +40,7 @@ func ResolveExpressionFrame(expression ast.Expression, environment *ResolveEnvir
 	environment.linkedLocals.PopTable()
 }
 
-func ResolveIdentifier(name string, environment *ResolveEnvironment) (address *symbols.AddressBox, free bool) {
+func ResolveIdentifier(name string, metadata *ast.Metadata, environment *ResolveEnvironment) (address *symbols.AddressBox, free bool) {
 	tryLocal, exists := FindLocal(name, environment)
 	if exists {
 		return tryLocal, false
@@ -61,5 +61,5 @@ func ResolveIdentifier(name string, environment *ResolveEnvironment) (address *s
 		return tryImport, false
 	}
 
-	panic(NewResolveError(name))
+	panic(NewResolveError(name, metadata))
 }

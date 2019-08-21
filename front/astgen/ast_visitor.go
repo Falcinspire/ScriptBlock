@@ -19,19 +19,19 @@ func newExpressionConvertVisitor() *expressionConvertVisitor {
 // EnterNumberExpr is the visitor enter method for number expressions.
 func (visitor *expressionConvertVisitor) EnterNumberExpr(ctx *parser.NumberExprContext) {
 	number, _ := strconv.ParseFloat(ctx.GetText(), 64)
-	visitor.Expression = ast.NewNumberExpression(number)
+	visitor.Expression = ast.NewNumberExpression(number, convertMetadata(ctx))
 }
 
 // EnterStringExpr is the visitor enter method for string expressions.
 func (visitor *expressionConvertVisitor) EnterStringExpr(ctx *parser.StringExprContext) {
 	stringV := ctx.GetText()
-	visitor.Expression = ast.NewStringExpression(stringV[1 : len(stringV)-1])
+	visitor.Expression = ast.NewStringExpression(stringV[1:len(stringV)-1], convertMetadata(ctx))
 
 }
 
 // EnterIdentifierExpr is the visitor enter method for identifier expressions.
 func (visitor *expressionConvertVisitor) EnterIdentifierExpr(ctx *parser.IdentifierExprContext) {
-	visitor.Expression = ast.NewIdentifierExpression(ctx.IDENTIFIER().GetText())
+	visitor.Expression = ast.NewIdentifierExpression(ctx.IDENTIFIER().GetText(), convertMetadata(ctx))
 
 }
 
@@ -40,7 +40,7 @@ func (visitor *expressionConvertVisitor) EnterAddExpr(ctx *parser.AddExprContext
 	left := convertExpression(ctx.Expression(0))
 	right := convertExpression(ctx.Expression(1))
 
-	visitor.Expression = ast.NewAddExpression(left, right)
+	visitor.Expression = ast.NewAddExpression(left, right, convertMetadata(ctx))
 }
 
 // EnterSubtractExpr is the visitor enter method for subtraction expressions.
@@ -48,7 +48,7 @@ func (visitor *expressionConvertVisitor) EnterSubtractExpr(ctx *parser.SubtractE
 	left := convertExpression(ctx.Expression(0))
 	right := convertExpression(ctx.Expression(1))
 
-	visitor.Expression = ast.NewSubtractExpression(left, right)
+	visitor.Expression = ast.NewSubtractExpression(left, right, convertMetadata(ctx))
 }
 
 // EnterMultiplyExpr is the visitor enter method for multiply expressions.
@@ -56,7 +56,7 @@ func (visitor *expressionConvertVisitor) EnterMultiplyExpr(ctx *parser.MultiplyE
 	left := convertExpression(ctx.Expression(0))
 	right := convertExpression(ctx.Expression(1))
 
-	visitor.Expression = ast.NewMultiplyExpression(left, right)
+	visitor.Expression = ast.NewMultiplyExpression(left, right, convertMetadata(ctx))
 }
 
 // EnterDivideExpr is the visitor enter method for divide expressions.
@@ -64,7 +64,7 @@ func (visitor *expressionConvertVisitor) EnterDivideExpr(ctx *parser.DivideExprC
 	left := convertExpression(ctx.Expression(0))
 	right := convertExpression(ctx.Expression(1))
 
-	visitor.Expression = ast.NewDivideExpression(left, right)
+	visitor.Expression = ast.NewDivideExpression(left, right, convertMetadata(ctx))
 }
 
 // EnterIntegerDivideExpr is the visitor enter method for integer divide expressions.
@@ -72,7 +72,7 @@ func (visitor *expressionConvertVisitor) EnterIntegerDivideExpr(ctx *parser.Inte
 	left := convertExpression(ctx.Expression(0))
 	right := convertExpression(ctx.Expression(1))
 
-	visitor.Expression = ast.NewIntegerDivideExpression(left, right)
+	visitor.Expression = ast.NewIntegerDivideExpression(left, right, convertMetadata(ctx))
 }
 
 // EnterPowerExpr is the visitor enter method for power expressions.
@@ -80,7 +80,7 @@ func (visitor *expressionConvertVisitor) EnterPowerExpr(ctx *parser.PowerExprCon
 	left := convertExpression(ctx.Expression(0))
 	right := convertExpression(ctx.Expression(1))
 
-	visitor.Expression = ast.NewPowerExpression(left, right)
+	visitor.Expression = ast.NewPowerExpression(left, right, convertMetadata(ctx))
 }
 
 // EnterParenthExpr is the visitor enter method for parenthesis expressions.
@@ -91,14 +91,14 @@ func (visitor *expressionConvertVisitor) EnterParenthExpr(ctx *parser.ParenthExp
 // EnterFormatterExpr is the visitor enter method for formatter expressions.
 func (visitor *expressionConvertVisitor) EnterFormatterExpr(ctx *parser.FormatterExprContext) {
 	formatterContext := ctx.Formatter().(*parser.FormatterContext)
-	visitor.Expression = ast.NewFormatterExpression(formatterContext.IDENTIFIER().GetText(), convertArgumentList(formatterContext.ArgumentList()))
+	visitor.Expression = ast.NewFormatterExpression(formatterContext.IDENTIFIER().GetText(), convertArgumentList(formatterContext.ArgumentList()), convertMetadata(ctx))
 }
 
 // EnterCallExpr is the visitor enter method for call expressions.
 func (visitor *expressionConvertVisitor) EnterCallExpr(ctx *parser.CallExprContext) {
 	identifier := ctx.IDENTIFIER().GetText()
 	argumentList := convertArgumentList(ctx.ArgumentList())
-	visitor.Expression = ast.NewCallExpression(ast.NewIdentifierExpression(identifier), argumentList)
+	visitor.Expression = ast.NewCallExpression(ast.NewIdentifierExpression(identifier, convertTokenMetadata(ctx.IDENTIFIER())), argumentList, convertMetadata(ctx))
 }
 
 type statementConvertVisitor struct {
@@ -119,14 +119,14 @@ func (visitor *statementConvertVisitor) EnterFunctionCallStatement(ctx *parser.F
 func (visitor *statementConvertVisitor) EnterNativeCallStatement(ctx *parser.NativeCallStatementContext) {
 	nativeCall := ctx.NativeCall().(*parser.NativeCallContext)
 	arguments := newExpressionConvertVisitor().QuickVisitArgumentList(nativeCall.ArgumentList())
-	visitor.Statement = ast.NewNativeCall(arguments)
+	visitor.Statement = ast.NewNativeCall(arguments, convertMetadata(ctx))
 }
 
 func (visitor *statementConvertVisitor) EnterDelayStructureStatement(ictx *parser.DelayStructureStatementContext) {
 	ctx := ictx.DelayStructure().(*parser.DelayStructureContext)
 	delay := newExpressionConvertVisitor().QuickVisitExpression(ctx.StructureList().(*parser.StructureListContext).Expression(0))
 	body := convertFunctionFrame(ctx.FunctionFrame())
-	visitor.Statement = ast.NewDelayStatement(delay, body.Body)
+	visitor.Statement = ast.NewDelayStatement(delay, body.Body, convertMetadata(ctx))
 }
 
 // EnterFunctionCallStatement is the visitor enter method for function call statements.
@@ -135,7 +135,7 @@ func (visitor *statementConvertVisitor) EnterRaiseStatement(lctx *parser.RaiseSt
 	identifierContexts := ctx.Tag().(*parser.TagContext).AllIDENTIFIER()
 	tag := convertTag(identifierContexts)
 
-	visitor.Statement = ast.NewRaiseStatement(tag)
+	visitor.Statement = ast.NewRaiseStatement(tag, convertMetadata(ctx))
 }
 
 //TODO maybe merge these?
@@ -184,7 +184,7 @@ func (visitor *topConvertVisitor) EnterConstantDefinitionTop(ctxSwitch *parser.C
 	if ctx.Documentation() != nil {
 		docs = convertDoc(ctx.Documentation())
 	}
-	visitor.Definition = ast.NewConstantDefinition(name, expression, internal, docs)
+	visitor.Definition = ast.NewConstantDefinition(name, expression, internal, docs, convertMetadata(ctx))
 }
 
 // EnterFunctionDefinitionTop is the visitor enter method for function definitions.
@@ -202,7 +202,7 @@ func (visitor *topConvertVisitor) EnterFunctionDefinitionTop(ctxSwitch *parser.F
 	if ctx.Documentation() != nil {
 		docs = convertDoc(ctx.Documentation())
 	}
-	visitor.Definition = ast.NewFunctionDefinition(name, frame.Body, internal, tag, docs)
+	visitor.Definition = ast.NewFunctionDefinition(name, frame.Body, internal, tag, docs, convertMetadata(ctx))
 }
 
 // EnterTemplateDefinitionTop is the visitor enter method for template definitions.
@@ -215,7 +215,7 @@ func (visitor *topConvertVisitor) EnterTemplateDefinitionTop(ctxSwitch *parser.T
 	if ctx.Documentation() != nil {
 		docs = convertDoc(ctx.Documentation())
 	}
-	visitor.Definition = ast.NewTemplateDefinition(name, frame.Parameters, frame.Body, internal, docs)
+	visitor.Definition = ast.NewTemplateDefinition(name, frame.Parameters, frame.Body, internal, docs, convertMetadata(ctx))
 }
 
 // EnterFunctionShortcutTop is the visitor enter method for shortcut definitions.
@@ -233,7 +233,7 @@ func (visitor *topConvertVisitor) EnterFunctionShortcutTop(ctxSwitch *parser.Fun
 	if ctx.Documentation() != nil {
 		docs = convertDoc(ctx.Documentation())
 	}
-	visitor.Definition = ast.NewFunctionShortcutDefinition(name, call, internal, tag, docs)
+	visitor.Definition = ast.NewFunctionShortcutDefinition(name, call, internal, tag, docs, convertMetadata(ctx))
 }
 
 type unitConvertVisitor struct {

@@ -61,7 +61,7 @@ func (visitor *DesugarStatementVisitor) VisitDelay(call *ast.DelayStatement) {
 	}).Info("rewriting delay call")
 
 	trailingToExpression := DesugarTrailing(&FunctionFrame{[]string{}, call.Body}, visitor.injector, visitor.depth, visitor.freeVariables)
-	call.FunctionCall = ast.NewFunctionCall(trailingToExpression, []ast.Expression{}, nil)
+	call.FunctionCall = ast.NewFunctionCall(trailingToExpression, []ast.Expression{}, nil, nil)
 }
 
 func (visitor *DesugarStatementVisitor) VisitNativeCall(call *ast.NativeCall) {

@@ -51,11 +51,11 @@ func DesugarTrailing(frame *FunctionFrame, injector *FunctionInjector, depth int
 	moduleName := toFunction.Module
 	unitName := toFunction.Unit
 	functionName := toFunction.Name
-	callIdentifier := ast.NewIdentifierExpression(functionName)
+	callIdentifier := ast.NewIdentifierExpression(functionName, nil)
 	callIdentifier.Address = symbols.NewUnitAddressBox(moduleName, unitName, functionName)
 	var expression ast.Expression
 	if len(captures) > 0 {
-		expression = ast.NewClosureExpression(callIdentifier, captures)
+		expression = ast.NewClosureExpression(callIdentifier, captures, nil)
 	} else {
 		expression = callIdentifier
 	}
@@ -128,7 +128,7 @@ func makeClosesSet(child *freeVariableSet) []string {
 func makeCaptureSet(child *freeVariableSet, depth int) []*ast.IdentifierExpression {
 	captures := make([]*ast.IdentifierExpression, len(ListFreeSet(child)))
 	for i, enclosedVariable := range ListFreeSet(child) {
-		captures[i] = ast.NewIdentifierExpression(enclosedVariable.Name)
+		captures[i] = ast.NewIdentifierExpression(enclosedVariable.Name, nil)
 		captures[i].Address = symbols.NewAddressBox(symbols.PARAMETER, enclosedVariable)
 		if enclosedVariable.ClosureDepth != depth {
 			captures[i].Free = true

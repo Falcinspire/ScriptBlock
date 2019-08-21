@@ -19,7 +19,7 @@ func NewResolveExpressionVisitor(environment *ResolveEnvironment) *ResolveExpres
 	return visitor
 }
 func (visitor *ResolveExpressionVisitor) VisitIdentifier(identifier *ast.IdentifierExpression) {
-	address, free := ResolveIdentifier(identifier.Name, visitor.environment)
+	address, free := ResolveIdentifier(identifier.Name, identifier.Metadata, visitor.environment)
 	identifier.Address = address
 	identifier.Free = free
 

@@ -23,7 +23,7 @@ script test_wrap { (z) ->
         }
     }
     test_scopes { (a, b) ->
-        command('say', a, b)
+        command('say', a, b, copppo)
     }
 
     delay [10] {
