@@ -26,7 +26,7 @@ type ResolveEnvironment struct {
 	imported     []symbols.SymbolTable
 }
 
-func CreateResolveEnvironment(unitLocation *location.UnitLocation, symbollibrary symbols.SymbolLibrary, importbook imports.ImportBook) *ResolveEnvironment {
+func CreateResolveEnvironment(unitLocation *location.UnitLocation, symbollibrary *symbols.SymbolLibrary, importbook imports.ImportBook) *ResolveEnvironment {
 	internal := symbols.LookupSymbolTable(unitLocation.Module, unitLocation.Unit, symbollibrary.Internal)
 	exported := symbols.LookupSymbolTable(unitLocation.Module, unitLocation.Unit, symbollibrary.Exported)
 	usedImports := imports.LookupImportList(unitLocation.Module, unitLocation.Unit, importbook)

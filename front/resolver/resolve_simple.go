@@ -7,7 +7,7 @@ import (
 	"github.com/falcinspire/scriptblock/front/symbols"
 )
 
-func ResolvePass(unit *ast.Unit, unitLocation *location.UnitLocation, symbollibrary symbols.SymbolLibrary, importbook imports.ImportBook) {
+func ResolvePass(unit *ast.Unit, unitLocation *location.UnitLocation, symbollibrary *symbols.SymbolLibrary, importbook imports.ImportBook) {
 	environment := CreateResolveEnvironment(unitLocation, symbollibrary, importbook)
 	unit.Accept(NewResolveUnitVisitor(unit, unitLocation, environment))
 }

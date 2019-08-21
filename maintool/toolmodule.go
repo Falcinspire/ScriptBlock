@@ -44,27 +44,21 @@ func DoModule(path string, output evaluator.OutputDirectory) {
 	locations := registerLocations(files, moduleFolder)
 	astbooko := parseAllToAsts(locations)
 	importbooko := takeImportsFromAsts(astbooko, locations)
+	symbollibrary := symbols.NewSymbolLibrary()
 	order := makeDependencyOrder(locations, importbooko)
 
 	logrus.WithFields(logrus.Fields{
 		"order": order,
 	}).Info("dependency order produced")
 
-	symbollibrary := symbols.NewSymbolLibrary()
+	RunFrontEnd(order, astbooko, importbooko, symbollibrary)
+
 	valuelibrary := values.NewValueLibrary()
 	addressbooko := addressbook.NewAddressBook()
 
 	theTags := make(map[string]tags.LocationList)
 
-	for _, informalLocation := range order {
-		unitLocation := location.LocationFromInformal(informalLocation)
-		DoUnit(unitLocation, astbooko, importbooko, symbollibrary, valuelibrary, addressbooko, theTags, output)
-
-		logrus.WithFields(logrus.Fields{
-			"module": unitLocation.Module,
-			"unit":   unitLocation.Unit,
-		}).Info("compiled unit")
-	}
+	RunBackEnd(order, astbooko, valuelibrary, addressbooko, theTags, output)
 
 	tags.WriteTags(theTags, output)
 }
@@ -138,4 +132,28 @@ func makeDependencyOrder(locations []*location.UnitLocation, importbooko imports
 	}
 
 	return dependency.MakeDependencyOrder(location.InformalPath(locations[0]), dependencyGraph)
+}
+
+func RunFrontEnd(order []string, astbooko astbook.AstBook, importbooko imports.ImportBook, symbolLibrary *symbols.SymbolLibrary) {
+	for _, informalLocation := range order {
+		unitLocation := location.LocationFromInformal(informalLocation)
+		DoUnitFront(unitLocation, astbooko, importbooko, symbolLibrary)
+
+		logrus.WithFields(logrus.Fields{
+			"module": unitLocation.Module,
+			"unit":   unitLocation.Unit,
+		}).Info("front end run on unit")
+	}
+}
+
+func RunBackEnd(order []string, astbooko astbook.AstBook, valueLibrary *values.ValueLibrary, addressbooko addressbook.AddressBook, theTags map[string]tags.LocationList, output evaluator.OutputDirectory) {
+	for _, informalLocation := range order {
+		unitLocation := location.LocationFromInformal(informalLocation)
+		DoUnitBack(unitLocation, astbooko, valueLibrary, addressbooko, theTags, output)
+
+		logrus.WithFields(logrus.Fields{
+			"module": unitLocation.Module,
+			"unit":   unitLocation.Unit,
+		}).Info("back end run on unit")
+	}
 }

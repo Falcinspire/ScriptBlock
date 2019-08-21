@@ -15,13 +15,25 @@ import (
 	"github.com/falcinspire/scriptblock/front/symbols"
 )
 
-func DoUnit(unitLocation *location.UnitLocation, astbooko astbook.AstBook, importbook imports.ImportBook, symbollibrary symbols.SymbolLibrary, valuelibrary *values.ValueLibrary, addressbook addressbook.AddressBook, theTags map[string]tags.LocationList, output evaluator.OutputDirectory) {
-	// front end
+// func DoUnit(unitLocation *location.UnitLocation, astbooko astbook.AstBook, importbook imports.ImportBook, symbollibrary symbols.SymbolLibrary, valuelibrary *values.ValueLibrary, addressbook addressbook.AddressBook, theTags map[string]tags.LocationList, output evaluator.OutputDirectory) {
+// 	// front end
+// 	astree := astbook.LookupAst(unitLocation, astbooko)
+// 	symbolgen.SymbolsPass(astree, unitLocation, symbollibrary)
+// 	resolver.ResolvePass(astree, unitLocation, symbollibrary, importbook)
+
+// 	// back end
+// 	desugar.DesugarUnit(astree, unitLocation)
+// 	valuepass.ValuePass(astree, unitLocation, valuelibrary, addressbook, theTags, output)
+// }
+
+func DoUnitFront(unitLocation *location.UnitLocation, astbooko astbook.AstBook, importbook imports.ImportBook, symbollibrary *symbols.SymbolLibrary) {
 	astree := astbook.LookupAst(unitLocation, astbooko)
 	symbolgen.SymbolsPass(astree, unitLocation, symbollibrary)
 	resolver.ResolvePass(astree, unitLocation, symbollibrary, importbook)
+}
 
-	// back end
+func DoUnitBack(unitLocation *location.UnitLocation, astbooko astbook.AstBook, valuelibrary *values.ValueLibrary, addressbook addressbook.AddressBook, theTags map[string]tags.LocationList, output evaluator.OutputDirectory) {
+	astree := astbook.LookupAst(unitLocation, astbooko)
 	desugar.DesugarUnit(astree, unitLocation)
 	valuepass.ValuePass(astree, unitLocation, valuelibrary, addressbook, theTags, output)
 }

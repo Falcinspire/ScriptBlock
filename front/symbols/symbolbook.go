@@ -5,8 +5,8 @@ type SymbolLibrary struct {
 	Internal SymbolBook
 }
 
-func NewSymbolLibrary() SymbolLibrary {
-	return SymbolLibrary{make(SymbolBook), make(SymbolBook)}
+func NewSymbolLibrary() *SymbolLibrary {
+	return &SymbolLibrary{make(SymbolBook), make(SymbolBook)}
 }
 
 type SymbolBook map[string]SymbolUnitBook
