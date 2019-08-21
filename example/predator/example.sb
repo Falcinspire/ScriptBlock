@@ -25,9 +25,6 @@ script test_wrap { (z) ->
     test_scopes { (a, b) ->
         command('say', a, b)
     }
-    test_scopes { (a, b) ->
-        command('say', a, b)
-    }
 
     delay [10] {
         command('say', 'arg')

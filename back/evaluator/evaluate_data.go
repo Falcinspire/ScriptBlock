@@ -16,11 +16,3 @@ type EvaluateData struct {
 	LoopInject   *LoopInject
 	Output       OutputDirectory
 }
-
-type LoopInject struct {
-	InjectBody []string
-}
-
-func NewLoopInject() *LoopInject {
-	return &LoopInject{[]string{}}
-}

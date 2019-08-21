@@ -7,7 +7,6 @@ import (
 	"github.com/falcinspire/scriptblock/back/tags"
 	"github.com/falcinspire/scriptblock/front/ast"
 	"github.com/falcinspire/scriptblock/front/location"
-	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -51,10 +50,8 @@ func (visitor *UnitThreeValueVisitor) VisitUnit(unit *ast.Unit) {
 		definition.Accept(NewTopThreeValueVisitor(visitor.data, visitor.tags))
 	}
 	if len(visitor.data.LoopInject.InjectBody) > 0 {
-		loopFunctionName := fmt.Sprintf("loop-%s", uuid.New().String())
-		loopFunctionBody := visitor.data.LoopInject.InjectBody
-		evaluator.DumpFunction(visitor.data.Location.Module, visitor.data.Location.Unit, loopFunctionName, loopFunctionBody, visitor.data.Output)
-		loopAddress := fmt.Sprintf("%s:%s/%s", visitor.data.Location.Module, visitor.data.Location.Unit, loopFunctionName)
+		module, unit, name := evaluator.GenerateTickFunction(visitor.data.LoopInject, visitor.data.Location, visitor.data.Output)
+		loopAddress := fmt.Sprintf("%s:%s/%s", module, unit, name)
 		visitor.tags["minecraft:tick"] = append(visitor.tags["minecraft:tick"], loopAddress)
 	}
 }
