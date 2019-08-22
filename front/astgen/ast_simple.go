@@ -110,21 +110,21 @@ func convertDoc(ictx parser.IDocumentationContext) string {
 
 func convertMetadata(node antlr.ParserRuleContext) *ast.Metadata {
 	return &ast.Metadata{
-		node.GetStart().GetLine(),
-		node.GetStart().GetColumn(),
-		node.GetStop().GetLine(),
-		node.GetStop().GetColumn(),
-		node.GetText(),
+		StartLine:   node.GetStart().GetLine(),
+		StartColumn: node.GetStart().GetColumn(),
+		EndLine:     node.GetStop().GetLine(),
+		EndColumn:   node.GetStop().GetColumn() + len(node.GetStop().GetText()),
+		Text:        node.GetText(),
 	}
 }
 
 func convertTokenMetadata(inode antlr.TerminalNode) *ast.Metadata {
 	node := inode.GetSymbol()
 	return &ast.Metadata{
-		node.GetLine(),
-		node.GetStart(),
-		node.GetLine(),
-		node.GetStop(),
-		node.GetText(),
+		StartLine:   node.GetLine(),
+		StartColumn: node.GetColumn(),
+		EndLine:     node.GetLine(),
+		EndColumn:   node.GetColumn() + len(node.GetText()),
+		Text:        node.GetText(),
 	}
 }

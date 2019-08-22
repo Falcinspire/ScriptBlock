@@ -1,6 +1,7 @@
 package resolver
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/falcinspire/scriptblock/front/ast"
@@ -18,7 +19,8 @@ func NewResolveError(symbol string, metadata *ast.Metadata) ResolveError {
 	return ResolveError{symbol, metadata}
 }
 func (this ResolveError) Error() string {
-	return fmt.Sprintf("Cannot resolve \"%s\", %s", this.name, this.metadata)
+	data, _ := json.Marshal(this.metadata)
+	return fmt.Sprintf("Cannot resolve \"%s\", %s", this.name, string(data))
 }
 
 type ResolveEnvironment struct {
