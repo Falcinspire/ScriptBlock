@@ -2,7 +2,6 @@ package resolver
 
 import (
 	"github.com/falcinspire/scriptblock/front/ast"
-	"github.com/falcinspire/scriptblock/front/location"
 	"github.com/falcinspire/scriptblock/front/symbols"
 	"github.com/sirupsen/logrus"
 )
@@ -115,8 +114,10 @@ func (visitor *ResolveTopDefinitionVisitor) VisitFunctionDefinition(definition *
 }
 
 func (visitor *ResolveTopDefinitionVisitor) VisitFunctionShortcutDefinition(shortcut *ast.FunctionShortcutDefinition) {
+	expressionVisitor := NewResolveExpressionVisitor(visitor.environment)
+	shortcut.FunctionCall.Callee.Accept(expressionVisitor)
 	for _, argument := range shortcut.FunctionCall.Arguments {
-		argument.Accept(NewResolveExpressionVisitor(visitor.environment))
+		argument.Accept(expressionVisitor)
 	}
 }
 
@@ -125,7 +126,6 @@ func (visitor *ResolveTopDefinitionVisitor) VisitTemplateDefinition(definition *
 
 	frame := &FunctionFrame{definition.Parameters, definition.Body}
 	environment := visitor.environment
-	// TODO why does this work?
 	depth := -1
 	ResolveFunctionFrame(frame, environment, depth)
 }
@@ -139,17 +139,11 @@ func (visitor *ResolveTopDefinitionVisitor) VisitConstantDefinition(definition *
 }
 
 type ResolveUnitVisitor struct {
-	unit        *ast.Unit
-	location    *location.UnitLocation
 	environment *ResolveEnvironment
 }
 
-func NewResolveUnitVisitor(unit *ast.Unit, location *location.UnitLocation, environment *ResolveEnvironment) *ResolveUnitVisitor {
-	visitor := new(ResolveUnitVisitor)
-	visitor.unit = unit
-	visitor.location = location
-	visitor.environment = environment
-	return visitor
+func NewResolveUnitVisitor(environment *ResolveEnvironment) *ResolveUnitVisitor {
+	return &ResolveUnitVisitor{environment}
 }
 func (visitor *ResolveUnitVisitor) VisitUnit(unit *ast.Unit) {
 	for _, definition := range unit.Definitions {

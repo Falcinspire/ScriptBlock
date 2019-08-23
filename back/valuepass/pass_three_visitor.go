@@ -3,6 +3,7 @@ package valuepass
 import (
 	"fmt"
 
+	"github.com/falcinspire/scriptblock/back/dumper"
 	"github.com/falcinspire/scriptblock/back/evaluator"
 	"github.com/falcinspire/scriptblock/back/tags"
 	"github.com/falcinspire/scriptblock/front/ast"
@@ -10,18 +11,18 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type TopThreeValueVisitor struct {
+type topThreeValueVisitor struct {
 	*ast.BaseTopVisitor
 
 	data *evaluator.EvaluateData
 	tags map[string]tags.LocationList
 }
 
-func NewTopThreeValueVisitor(data *evaluator.EvaluateData, tags map[string]tags.LocationList) *TopThreeValueVisitor {
-	return &TopThreeValueVisitor{nil, data, tags}
+func newTopThreeValueVisitor(data *evaluator.EvaluateData, tags map[string]tags.LocationList) *topThreeValueVisitor {
+	return &topThreeValueVisitor{nil, data, tags}
 }
 
-func (visitor *TopThreeValueVisitor) VisitFunctionDefinition(definition *ast.FunctionDefinition) {
+func (visitor *topThreeValueVisitor) VisitFunctionDefinition(definition *ast.FunctionDefinition) {
 	logrus.WithFields(logrus.Fields{
 		"module": visitor.data.Location.Module,
 		"unit":   visitor.data.Location.Unit,
@@ -29,25 +30,25 @@ func (visitor *TopThreeValueVisitor) VisitFunctionDefinition(definition *ast.Fun
 	}).Info("Evaluating function")
 
 	stringBody := evaluator.TranslateFunction(definition, visitor.data.Location, visitor.data)
-	evaluator.DumpFunction(visitor.data.Location.Module, visitor.data.Location.Unit, definition.Name, stringBody, visitor.data.Output)
+	dumper.DumpFunction(visitor.data.Location.Module, visitor.data.Location.Unit, definition.Name, stringBody, visitor.data.Output)
 	if definition.Tag.Namespace != "" {
 		informal := location.InformalTagPath(location.NewTagLocation(definition.Tag.Namespace, definition.Tag.Identity))
 		visitor.tags[informal] = append(visitor.tags[informal], fmt.Sprintf("%s:%s/%s", visitor.data.Location.Module, visitor.data.Location.Unit, definition.Name))
 	}
 }
 
-type UnitThreeValueVisitor struct {
+type unitThreeValueVisitor struct {
 	data *evaluator.EvaluateData
 	tags map[string]tags.LocationList
 }
 
-func NewUnitThreeValueVisitor(data *evaluator.EvaluateData, tags map[string]tags.LocationList) *UnitThreeValueVisitor {
-	return &UnitThreeValueVisitor{data, tags}
+func newUnitThreeValueVisitor(data *evaluator.EvaluateData, tags map[string]tags.LocationList) *unitThreeValueVisitor {
+	return &unitThreeValueVisitor{data, tags}
 }
 
-func (visitor *UnitThreeValueVisitor) VisitUnit(unit *ast.Unit) {
+func (visitor *unitThreeValueVisitor) VisitUnit(unit *ast.Unit) {
 	for _, definition := range unit.Definitions {
-		definition.Accept(NewTopThreeValueVisitor(visitor.data, visitor.tags))
+		definition.Accept(newTopThreeValueVisitor(visitor.data, visitor.tags))
 	}
 	if len(visitor.data.LoopInject.InjectBody) > 0 {
 		module, unit, name := evaluator.GenerateTickFunction(visitor.data.LoopInject, visitor.data.Location, visitor.data.Output)

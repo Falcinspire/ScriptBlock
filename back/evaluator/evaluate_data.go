@@ -1,12 +1,11 @@
 package evaluator
 
 import (
+	"github.com/falcinspire/scriptblock/back/output"
 	"github.com/falcinspire/scriptblock/back/values"
 	"github.com/falcinspire/scriptblock/front/addressbook"
 	"github.com/falcinspire/scriptblock/front/location"
 )
-
-type OutputDirectory = string
 
 type EvaluateData struct {
 	Location     *location.UnitLocation
@@ -14,5 +13,5 @@ type EvaluateData struct {
 	ValueLibrary *values.ValueLibrary
 	AddressBook  addressbook.AddressBook
 	LoopInject   *LoopInject
-	Output       OutputDirectory
+	Output       output.OutputDirectory
 }

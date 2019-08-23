@@ -8,7 +8,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/falcinspire/scriptblock/back/evaluator"
+	"github.com/falcinspire/scriptblock/back/output"
 	"github.com/falcinspire/scriptblock/back/tags"
 	"github.com/falcinspire/scriptblock/front/astgen"
 	"github.com/falcinspire/scriptblock/front/parser"
@@ -22,7 +22,7 @@ import (
 	"github.com/falcinspire/scriptblock/front/symbols"
 )
 
-func DoModule(path string, output evaluator.OutputDirectory) {
+func DoModule(path string, output output.OutputDirectory) {
 
 	// this could be dangerous if given wrong directory
 	// if _, err := os.Stat(output); !os.IsNotExist(err) {
@@ -60,7 +60,7 @@ func DoModule(path string, output evaluator.OutputDirectory) {
 
 	RunBackEnd(order, astbooko, valuelibrary, addressbooko, theTags, output)
 
-	tags.WriteTags(theTags, output)
+	tags.WriteAllTagsToFiles(theTags, output)
 }
 
 func registerLocations(files []os.FileInfo, moduleFolder string) []*location.UnitLocation {
@@ -146,7 +146,7 @@ func RunFrontEnd(order []string, astbooko astbook.AstBook, importbooko imports.I
 	}
 }
 
-func RunBackEnd(order []string, astbooko astbook.AstBook, valueLibrary *values.ValueLibrary, addressbooko addressbook.AddressBook, theTags map[string]tags.LocationList, output evaluator.OutputDirectory) {
+func RunBackEnd(order []string, astbooko astbook.AstBook, valueLibrary *values.ValueLibrary, addressbooko addressbook.AddressBook, theTags map[string]tags.LocationList, output output.OutputDirectory) {
 	for _, informalLocation := range order {
 		unitLocation := location.LocationFromInformal(informalLocation)
 		DoUnitBack(unitLocation, astbooko, valueLibrary, addressbooko, theTags, output)

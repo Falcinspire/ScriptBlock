@@ -8,30 +8,30 @@ import (
 	"github.com/falcinspire/scriptblock/front/symbols"
 )
 
-type FunctionFrame struct {
+type functionFrame struct {
 	Parameters []string
 	Body       []ast.Statement
 }
 
-func DesugarUnit(unit *ast.Unit, location *location.UnitLocation) {
+// Unit removes the syntactic sugar from the tree, performing tree rewrites/injections as needed
+func Unit(unit *ast.Unit, location *location.UnitLocation) {
 	for i, definition := range unit.Definitions {
-		definition.Accept(NewDesugarTopDefinitionVisitor(NewFunctionInjector(unit, location, i)))
+		definition.Accept(newDesugarTopDefinitionVisitor(newFunctionInjector(unit, location, i)))
 	}
 }
 
-// TODO maybe change depth before entering function, or before any functions are called
-func DesugarFunctionFrame(frame *FunctionFrame, injector *FunctionInjector, depth int) *freeVariableSet {
+func desugarFunctionFrame(frame *functionFrame, injector *functionInjector, depth int) *freeVariableSet {
 	freeVars := newFreeVariableSet()
 
 	for i, statement := range frame.Body {
-		statement.Accept(NewDesugarStatementVisitor(injector, NewStatementRewriter(frame.Body, i), depth+1, freeVars))
+		statement.Accept(newDesugarStatementVisitor(injector, NewStatementRewriter(frame.Body, i), depth+1, freeVars))
 	}
 
 	return freeVars
 }
 
-func DesugarExpressionFrame(expression ast.Expression) {
-	expressionVisitor := NewDesugarExpressionVisitor(0, newFreeVariableSet())
+func desugarExpressionFrame(expression ast.Expression) {
+	expressionVisitor := newDesugarExpressionVisitor(0, newFreeVariableSet())
 	expression.Accept(expressionVisitor)
 }
 
@@ -40,12 +40,12 @@ type desugaredBody struct {
 	PassCaptures       []*ast.IdentifierExpression
 }
 
-func DesugarTrailing(frame *FunctionFrame, injector *FunctionInjector, depth int, freeVariables *freeVariableSet) ast.Expression {
-	toFunction := DesugarBody(frame, injector, depth, freeVariables)
+func desugarTrailing(frame *functionFrame, injector *functionInjector, depth int, freeVariables *freeVariableSet) ast.Expression {
+	toFunction := desugarBody(frame, injector, depth, freeVariables)
 
 	captures := toFunction.PassCaptures
 	for _, aCapture := range captures {
-		aCapture.Accept(NewDesugarExpressionVisitor(depth, freeVariables))
+		aCapture.Accept(newDesugarExpressionVisitor(depth, freeVariables))
 	}
 
 	moduleName := toFunction.Module
@@ -62,8 +62,8 @@ func DesugarTrailing(frame *FunctionFrame, injector *FunctionInjector, depth int
 	return expression
 }
 
-func DesugarBody(frame *FunctionFrame, injector *FunctionInjector, depth int, freeVariables *freeVariableSet) *desugaredBody {
-	childFreeVariables := DesugarFunctionFrame(frame, injector, depth)
+func desugarBody(frame *functionFrame, injector *functionInjector, depth int, freeVariables *freeVariableSet) *desugaredBody {
+	childFreeVariables := desugarFunctionFrame(frame, injector, depth)
 
 	var module string
 	var unit string
@@ -75,7 +75,7 @@ func DesugarBody(frame *FunctionFrame, injector *FunctionInjector, depth int, fr
 		closes = []string{}
 		captures = []*ast.IdentifierExpression{}
 
-		module, unit, name = injector.InjectFunction(frame.Body)
+		module, unit, name = injector.injectFunction(frame.Body)
 
 		logrus.WithFields(logrus.Fields{
 			"name": name,
@@ -86,7 +86,7 @@ func DesugarBody(frame *FunctionFrame, injector *FunctionInjector, depth int, fr
 		closes = []string{}
 		captures = []*ast.IdentifierExpression{}
 
-		module, unit, name = injector.InjectTemplate(frame.Parameters, frame.Body)
+		module, unit, name = injector.injectTemplate(frame.Parameters, frame.Body)
 
 		logrus.WithFields(logrus.Fields{
 			"name": name,
@@ -98,7 +98,7 @@ func DesugarBody(frame *FunctionFrame, injector *FunctionInjector, depth int, fr
 		closes = makeClosesSet(childFreeVariables)
 		captures = makeCaptureSet(childFreeVariables, depth)
 
-		module, unit, name = injector.InjectClosure(frame.Parameters, closes, frame.Body)
+		module, unit, name = injector.injectClosure(frame.Parameters, closes, frame.Body)
 
 		logrus.WithFields(logrus.Fields{
 			"name": name,

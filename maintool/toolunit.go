@@ -2,7 +2,7 @@ package maintool
 
 import (
 	"github.com/falcinspire/scriptblock/back/desugar"
-	"github.com/falcinspire/scriptblock/back/evaluator"
+	"github.com/falcinspire/scriptblock/back/output"
 	"github.com/falcinspire/scriptblock/back/tags"
 	"github.com/falcinspire/scriptblock/back/valuepass"
 	"github.com/falcinspire/scriptblock/back/values"
@@ -21,8 +21,8 @@ func DoUnitFront(unitLocation *location.UnitLocation, astbooko astbook.AstBook, 
 	resolver.ResolvePass(astree, unitLocation, symbollibrary, importbook)
 }
 
-func DoUnitBack(unitLocation *location.UnitLocation, astbooko astbook.AstBook, valuelibrary *values.ValueLibrary, addressbook addressbook.AddressBook, theTags map[string]tags.LocationList, output evaluator.OutputDirectory) {
+func DoUnitBack(unitLocation *location.UnitLocation, astbooko astbook.AstBook, valuelibrary *values.ValueLibrary, addressbook addressbook.AddressBook, theTags map[string]tags.LocationList, output output.OutputDirectory) {
 	astree := astbook.LookupAst(unitLocation, astbooko)
-	desugar.DesugarUnit(astree, unitLocation)
+	desugar.Unit(astree, unitLocation)
 	valuepass.ValuePass(astree, unitLocation, valuelibrary, addressbook, theTags, output)
 }

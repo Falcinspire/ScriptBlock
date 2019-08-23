@@ -9,7 +9,7 @@ import (
 
 func ResolvePass(unit *ast.Unit, unitLocation *location.UnitLocation, symbollibrary *symbols.SymbolLibrary, importbook imports.ImportBook) {
 	environment := CreateResolveEnvironment(unitLocation, symbollibrary, importbook)
-	unit.Accept(NewResolveUnitVisitor(unit, unitLocation, environment))
+	unit.Accept(NewResolveUnitVisitor(environment))
 }
 
 func MakeLocalTableFromParameters(parameters []string, depth int) symbols.LocalSymbolTable {

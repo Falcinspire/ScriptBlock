@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/falcinspire/scriptblock/back/dumper"
 	"github.com/falcinspire/scriptblock/back/nativefuncs"
 	"github.com/falcinspire/scriptblock/back/values"
 	"github.com/falcinspire/scriptblock/front/ast"
@@ -33,7 +34,7 @@ func (visitor *ReduceExpressionVisitor) VisitString(stringExpression *ast.String
 	visitor.Result = values.NewStringValue(stringExpression.Value)
 }
 func (visitor *ReduceExpressionVisitor) VisitIdentifier(identifier *ast.IdentifierExpression) {
-	visitor.Result = ReduceAddress(identifier.Address, visitor.data)
+	visitor.Result = GetValueForAddress(identifier.Address, visitor.data)
 }
 func (visitor *ReduceExpressionVisitor) VisitClosure(closure *ast.ClosureExpression) {
 	callee := ReduceExpression(closure.Callee, visitor.data).(*values.ClosureReferenceValue)
@@ -98,7 +99,7 @@ func (visitor *ReduceExpressionVisitor) VisitCall(call *ast.CallExpression) {
 			visitor.Result = values.NewStringValue(result.Lines[0])
 		} else {
 			generatedName := fmt.Sprintf("%s-%s", visitor.data.Location.Unit, uuid.New().String())
-			DumpFunction(visitor.data.Location.Module, visitor.data.Location.Unit, generatedName, result.Lines, visitor.data.Output)
+			dumper.DumpFunction(visitor.data.Location.Module, visitor.data.Location.Unit, generatedName, result.Lines, visitor.data.Output)
 			visitor.Result = values.NewFunctionValue(visitor.data.Location.Module, visitor.data.Location.Unit, generatedName)
 		}
 	} else {

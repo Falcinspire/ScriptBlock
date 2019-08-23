@@ -28,7 +28,7 @@ func ReduceArgumentList(arguments []ast.Expression, data *EvaluateData) []values
 	return argumentValues
 }
 
-func ReduceAddress(address *symbols.AddressBox, data *EvaluateData) values.Value {
+func GetValueForAddress(address *symbols.AddressBox, data *EvaluateData) values.Value {
 	switch address.Type {
 	case symbols.UNIT:
 		unitAddress := address.Data.(*symbols.UnitAddress)

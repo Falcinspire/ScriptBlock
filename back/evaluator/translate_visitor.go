@@ -16,9 +16,11 @@ type TranslateStatementVisitor struct {
 }
 
 func NewTranslateStatementVisitor(data *EvaluateData) *TranslateStatementVisitor {
-	visitor := new(TranslateStatementVisitor)
-	visitor.data = data
-	return visitor
+	return &TranslateStatementVisitor{[]string{}, data}
+}
+func (visitor *TranslateStatementVisitor) QuickVisitStatement(statement ast.Statement) []string {
+	statement.Accept(visitor)
+	return visitor.Lines
 }
 func (visitor *TranslateStatementVisitor) VisitFunctionCall(call *ast.FunctionCall) {
 	invoker := ReduceExpression(call.Callee, visitor.data)

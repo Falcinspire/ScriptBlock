@@ -7,11 +7,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func ValuePassThree(unit *ast.Unit, data *evaluator.EvaluateData, tags map[string]tags.LocationList) {
+func PassThree(unit *ast.Unit, data *evaluator.EvaluateData, tags map[string]tags.LocationList) {
 	logrus.WithFields(logrus.Fields{
 		"module": data.Location.Module,
 		"unit":   data.Location.Unit,
 	}).Info("Value pass 3")
 
-	unit.Accept(NewUnitThreeValueVisitor(data, tags))
+	unit.Accept(newUnitThreeValueVisitor(data, tags))
 }

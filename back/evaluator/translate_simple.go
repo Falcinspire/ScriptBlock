@@ -1,9 +1,10 @@
 package evaluator
 
 import (
+	"github.com/falcinspire/scriptblock/back/values"
 	"github.com/falcinspire/scriptblock/front/ast"
 	"github.com/falcinspire/scriptblock/front/location"
-	"github.com/falcinspire/scriptblock/back/values"
+	"github.com/falcinspire/scriptblock/front/symbols"
 )
 
 func TranslateFrame(frame *CallFrame, data *EvaluateData) []string {
@@ -26,16 +27,15 @@ func TranslateFrame(frame *CallFrame, data *EvaluateData) []string {
 	}
 
 	stringBody := make([]string, 0)
+	statementVisitor := NewTranslateStatementVisitor(newData)
 	for _, statement := range frame.Body {
-		statementVisitor := NewTranslateStatementVisitor(newData)
-		statement.Accept(statementVisitor)
-		stringBody = append(stringBody, statementVisitor.Lines...)
+		stringBody = append(stringBody, statementVisitor.QuickVisitStatement(statement)...)
 	}
 	return stringBody
 }
 
 func TranslateTemplate(definition *ast.TemplateDefinition, arguments []values.Value, location *location.UnitLocation, data *EvaluateData) []string {
-	frame := &CallFrame{location, definition.Name, definition.Body, definition.Parameters, make([]string, 0), arguments, make([]values.Value, 0)}
+	frame := &CallFrame{location, definition.Name, definition.Body, definition.Parameters, symbols.NoCloses(), arguments, values.NoCaptures()}
 	return TranslateFrame(frame, data)
 }
 
@@ -45,6 +45,6 @@ func TranslateClosure(definition *ast.ClosureDefinition, arguments []values.Valu
 }
 
 func TranslateFunction(definition *ast.FunctionDefinition, location *location.UnitLocation, data *EvaluateData) []string {
-	frame := &CallFrame{location, definition.Name, definition.Body, make([]string, 0), make([]string, 0), make([]values.Value, 0), make([]values.Value, 0)}
+	frame := &CallFrame{location, definition.Name, definition.Body, symbols.NoParameters(), symbols.NoCloses(), values.NoArguments(), values.NoCaptures()}
 	return TranslateFrame(frame, data)
 }
