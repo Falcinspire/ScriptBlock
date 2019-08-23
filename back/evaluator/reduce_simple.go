@@ -15,15 +15,14 @@ func ReduceIdentifier(identifier *ast.IdentifierExpression, data *EvaluateData) 
 }
 
 func ReduceExpression(expression ast.Expression, data *EvaluateData) values.Value {
-	visitor := NewReduceExpressionVisitor(data)
-	expression.Accept(visitor)
-	return visitor.Result
+	return NewReduceExpressionVisitor(data).QuickVisitExpression(expression)
 }
 
 func ReduceArgumentList(arguments []ast.Expression, data *EvaluateData) []values.Value {
 	argumentValues := make([]values.Value, len(arguments))
+	expressionVisitor := NewReduceExpressionVisitor(data)
 	for i, argument := range arguments {
-		argumentValues[i] = ReduceExpression(argument, data)
+		argumentValues[i] = expressionVisitor.QuickVisitExpression(argument)
 	}
 	return argumentValues
 }
