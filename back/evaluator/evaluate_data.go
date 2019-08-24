@@ -13,5 +13,6 @@ type EvaluateData struct {
 	ValueLibrary *values.ValueLibrary
 	AddressBook  addressbook.AddressBook
 	LoopInject   *LoopInject
+	ModulePath   string
 	Output       output.OutputDirectory
 }

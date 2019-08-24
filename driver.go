@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
+	"github.com/falcinspire/scriptblock/home"
 	"github.com/falcinspire/scriptblock/maintool"
 	"github.com/sirupsen/logrus"
 )
@@ -13,7 +15,16 @@ func init() {
 }
 
 func main() {
+
+	// predator, _ := home.FindModuleInHome("predator")
+	// data, _ := json.Marshal(moduledat.ReadModuleData(predator))
+	// fmt.Println(string(data))
+
 	module := os.Args[1]
-	output := os.Args[2]
-	maintool.DoModule(module, output)
+	modulePath, exists := home.FindModuleInHome(module)
+	if !exists {
+		panic(fmt.Errorf("no module by name %s", module))
+	}
+	outputPath := home.MakeModuleOutput(module)
+	maintool.DoModule(modulePath, outputPath)
 }

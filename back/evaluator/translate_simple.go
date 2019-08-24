@@ -23,6 +23,7 @@ func TranslateFrame(frame *CallFrame, data *EvaluateData) []string {
 		data.ValueLibrary,
 		data.AddressBook,
 		data.LoopInject,
+		data.ModulePath,
 		data.Output,
 	}
 

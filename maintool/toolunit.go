@@ -21,8 +21,8 @@ func DoUnitFront(unitLocation *location.UnitLocation, astbooko astbook.AstBook, 
 	resolver.ResolvePass(astree, unitLocation, symbollibrary, importbook)
 }
 
-func DoUnitBack(unitLocation *location.UnitLocation, astbooko astbook.AstBook, valuelibrary *values.ValueLibrary, addressbook addressbook.AddressBook, theTags map[string]tags.LocationList, output output.OutputDirectory) {
+func DoUnitBack(unitLocation *location.UnitLocation, astbooko astbook.AstBook, valuelibrary *values.ValueLibrary, addressbook addressbook.AddressBook, theTags map[string]tags.LocationList, modulePath string, output output.OutputDirectory) {
 	astree := astbook.LookupAst(unitLocation, astbooko)
 	desugar.Unit(astree, unitLocation)
-	valuepass.ValuePass(astree, unitLocation, valuelibrary, addressbook, theTags, output)
+	valuepass.ValuePass(astree, unitLocation, valuelibrary, addressbook, theTags, modulePath, output)
 }

@@ -11,13 +11,14 @@ import (
 )
 
 // ValuePass performs all the necessary passes to evaluate and create .mcfunctions for the tree
-func ValuePass(unit *ast.Unit, location *location.UnitLocation, valueLibrary *values.ValueLibrary, addressBook addressbook.AddressBook, tags map[string]tags.LocationList, output output.OutputDirectory) {
+func ValuePass(unit *ast.Unit, location *location.UnitLocation, valueLibrary *values.ValueLibrary, addressBook addressbook.AddressBook, tags map[string]tags.LocationList, modulePath string, output output.OutputDirectory) {
 	data := &evaluator.EvaluateData{
 		Location:     location,
 		LocalValues:  nil,
 		ValueLibrary: valueLibrary,
 		AddressBook:  addressBook,
 		LoopInject:   evaluator.NewLoopInject(),
+		ModulePath:   modulePath,
 		Output:       output,
 	}
 	addressbook.InsertAddressTable(location.Module, location.Unit, addressbook.NewAddressTable(), addressBook)

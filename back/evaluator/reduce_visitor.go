@@ -94,7 +94,7 @@ func (visitor *ReduceExpressionVisitor) VisitPower(add *ast.PowerExpression) {
 }
 func (visitor *ReduceExpressionVisitor) VisitFormatter(formatter *ast.FormatterExpression) {
 	valueArray := visitor.QuickVisitArgumentList(formatter.Arguments)
-	stringResult := visitor.nativeMap[formatter.Format](valueArray)
+	stringResult := visitor.nativeMap[formatter.Format](visitor.data.ModulePath, valueArray)
 	visitor.Result = values.NewStringValue(stringResult)
 }
 func (visitor *ReduceExpressionVisitor) VisitCall(call *ast.CallExpression) {

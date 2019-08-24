@@ -2,29 +2,31 @@ package nativefuncs
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/falcinspire/scriptblock/back/values"
 )
 
 // NativeFunction is a function that is run with arguments and returns a string
-type NativeFunction func(args []values.Value) string
+type NativeFunction func(modulepath string, args []values.Value) string
 
 // numberAsInt converts the number given as the first argument into an integer
-func numberAsInt(args []values.Value) string {
+func numberAsInt(modulepath string, args []values.Value) string {
 	valueAsInt := int(args[0].(*values.NumberValue).Value)
 	return fmt.Sprintf("%d", valueAsInt)
 }
 
 // fromFile reads the file at the string path provided and returns its contents
 // without whitespaces
-func fromFile(args []values.Value) string {
+func fromFile(modulepath string, args []values.Value) string {
 	valueAsString := args[0].(*values.StringValue).Value
-	return readResource(valueAsString)
+	resourcePath := filepath.Join(modulepath, valueAsString)
+	return readResource(resourcePath)
 }
 
 // joinToSelector joins all the arguments as strings into a selector
-func joinToSelector(args []values.Value) string {
+func joinToSelector(modulepath string, args []values.Value) string {
 	valuesAsStringArray := make([]string, len(args))
 	for i, arrayValue := range args {
 		valuesAsStringArray[i] = arrayValue.(*values.StringValue).Value
@@ -35,7 +37,7 @@ func joinToSelector(args []values.Value) string {
 
 // joinStrings joins all the arguments as strings into a string.
 // This is useful when things need to be joined without a space inbetween.
-func joinStrings(args []values.Value) string {
+func joinStrings(modulepath string, args []values.Value) string {
 	valuesAsStringArray := make([]string, len(args))
 	for i, arrayValue := range args {
 		valuesAsStringArray[i] = fmt.Sprintf("%s", arrayValue)
@@ -45,7 +47,7 @@ func joinStrings(args []values.Value) string {
 
 // giveQuotes puts quotes around the first argument provided.
 // This makes the argument into a string expression.
-func giveQuotes(args []values.Value) string {
+func giveQuotes(modulepath string, args []values.Value) string {
 	valueAsString := args[0].(*values.StringValue).Value
 	return fmt.Sprintf("\"%s\"", valueAsString)
 }

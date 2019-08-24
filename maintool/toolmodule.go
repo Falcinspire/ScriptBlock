@@ -14,9 +14,9 @@ import (
 	"github.com/falcinspire/scriptblock/front/parser"
 
 	"github.com/falcinspire/scriptblock/back/values"
+	"github.com/falcinspire/scriptblock/dependency"
 	"github.com/falcinspire/scriptblock/front/addressbook"
 	"github.com/falcinspire/scriptblock/front/astbook"
-	"github.com/falcinspire/scriptblock/front/dependency"
 	"github.com/falcinspire/scriptblock/front/imports"
 	"github.com/falcinspire/scriptblock/front/location"
 	"github.com/falcinspire/scriptblock/front/symbols"
@@ -58,22 +58,29 @@ func DoModule(path string, output output.OutputDirectory) {
 
 	theTags := make(map[string]tags.LocationList)
 
-	RunBackEnd(order, astbooko, valuelibrary, addressbooko, theTags, output)
+	RunBackEnd(order, astbooko, valuelibrary, addressbooko, theTags, path, output)
 
 	tags.WriteAllTagsToFiles(theTags, output)
 }
 
 func registerLocations(files []os.FileInfo, moduleFolder string) []*location.UnitLocation {
-	locations := make([]*location.UnitLocation, len(files))
+	locations := make([]*location.UnitLocation, 0)
 
-	for i, file := range files {
-		unitName := strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
-		locations[i] = location.NewUnitLocation(moduleFolder, unitName)
+	for _, file := range files {
+		if filepath.Ext(file.Name()) == ".sb" {
+			unitName := strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
+			locations = append(locations, location.NewUnitLocation(moduleFolder, unitName))
 
-		logrus.WithFields(logrus.Fields{
-			"module": moduleFolder,
-			"unit":   unitName,
-		}).Info("identified unit")
+			logrus.WithFields(logrus.Fields{
+				"module": moduleFolder,
+				"unit":   unitName,
+			}).Info("identified unit")
+		} else {
+			logrus.WithFields(logrus.Fields{
+				"module": moduleFolder,
+				"unit":   file.Name(),
+			}).Info("skipping non-unit")
+		}
 	}
 
 	return locations
@@ -146,10 +153,10 @@ func RunFrontEnd(order []string, astbooko astbook.AstBook, importbooko imports.I
 	}
 }
 
-func RunBackEnd(order []string, astbooko astbook.AstBook, valueLibrary *values.ValueLibrary, addressbooko addressbook.AddressBook, theTags map[string]tags.LocationList, output output.OutputDirectory) {
+func RunBackEnd(order []string, astbooko astbook.AstBook, valueLibrary *values.ValueLibrary, addressbooko addressbook.AddressBook, theTags map[string]tags.LocationList, modulePath string, output output.OutputDirectory) {
 	for _, informalLocation := range order {
 		unitLocation := location.LocationFromInformal(informalLocation)
-		DoUnitBack(unitLocation, astbooko, valueLibrary, addressbooko, theTags, output)
+		DoUnitBack(unitLocation, astbooko, valueLibrary, addressbooko, theTags, modulePath, output)
 
 		logrus.WithFields(logrus.Fields{
 			"module": unitLocation.Module,
