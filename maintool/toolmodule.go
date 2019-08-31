@@ -22,7 +22,12 @@ import (
 	"github.com/falcinspire/scriptblock/front/symbols"
 )
 
-func DoModule(path string, output output.OutputDirectory) {
+type UnitLocationPath struct {
+	location *location.UnitLocation
+	filepath string
+}
+
+func DoModule(globalPath string, modulePath string, output output.OutputDirectory) {
 
 	// this could be dangerous if given wrong directory
 	// if _, err := os.Stat(output); !os.IsNotExist(err) {
@@ -30,18 +35,16 @@ func DoModule(path string, output output.OutputDirectory) {
 	// 	os.MkdirAll(output, os.ModePerm)
 	// }
 
-	moduleFolder := filepath.Base(path)
-
 	logrus.WithFields(logrus.Fields{
-		"module": moduleFolder,
+		"module": modulePath,
 	}).Info("compiling module")
 
-	files, err := ioutil.ReadDir(path)
+	files, err := ioutil.ReadDir(globalPath)
 	if err != nil {
 		panic(err)
 	}
 
-	locations := registerLocations(files, moduleFolder)
+	locations := registerLocations(files, globalPath, filepath.Dir(modulePath), filepath.Base(modulePath))
 	astbooko := parseAllToAsts(locations)
 	importbooko := takeImportsFromAsts(astbooko, locations)
 	symbollibrary := symbols.NewSymbolLibrary()
@@ -58,18 +61,18 @@ func DoModule(path string, output output.OutputDirectory) {
 
 	theTags := make(map[string]tags.LocationList)
 
-	RunBackEnd(order, astbooko, valuelibrary, addressbooko, theTags, path, output)
+	RunBackEnd(order, astbooko, valuelibrary, addressbooko, theTags, globalPath, output)
 
 	tags.WriteAllTagsToFiles(theTags, output)
 }
 
-func registerLocations(files []os.FileInfo, moduleFolder string) []*location.UnitLocation {
-	locations := make([]*location.UnitLocation, 0)
+func registerLocations(files []os.FileInfo, modulePath, moduleLocation, moduleFolder string) []*UnitLocationPath {
+	locations := make([]*UnitLocationPath, 0)
 
 	for _, file := range files {
 		if filepath.Ext(file.Name()) == ".sb" {
 			unitName := strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
-			locations = append(locations, location.NewUnitLocation(moduleFolder, unitName))
+			locations = append(locations, &UnitLocationPath{location.NewUnitLocation(moduleLocation, moduleFolder, unitName), filepath.Join(modulePath, file.Name())})
 
 			logrus.WithFields(logrus.Fields{
 				"module": moduleFolder,
@@ -86,59 +89,60 @@ func registerLocations(files []os.FileInfo, moduleFolder string) []*location.Uni
 	return locations
 }
 
-func parseAllToAsts(locations []*location.UnitLocation) astbook.AstBook {
+func parseAllToAsts(locations []*UnitLocationPath) astbook.AstBook {
 	astbooko := astbook.NewAstBook()
 	for _, unitlocation := range locations {
-		pstree := parser.Parse(unitlocation)
+		pstree := parser.Parse(unitlocation.filepath)
 		astree := astgen.PSTtoAST(pstree)
-		astbook.InsertAst(unitlocation, astree, astbooko)
+		astbook.InsertAst(unitlocation.location, astree, astbooko)
 
 		logrus.WithFields(logrus.Fields{
-			"module": unitlocation.Module,
-			"unit":   unitlocation.Unit,
+			"module": unitlocation.location.Module,
+			"unit":   unitlocation.location.Unit,
+			"path":   unitlocation.filepath,
 		}).Info("ast produced")
 	}
 	return astbooko
 }
 
-func takeImportsFromAsts(astbooko astbook.AstBook, locations []*location.UnitLocation) imports.ImportBook {
+func takeImportsFromAsts(astbooko astbook.AstBook, locations []*UnitLocationPath) imports.ImportBook {
 	importbooko := imports.NewImportBook()
 	for _, unitlocation := range locations {
-		astree := astbook.LookupAst(unitlocation, astbooko)
+		astree := astbook.LookupAst(unitlocation.location, astbooko)
 		importList := imports.TakeImports(astree)
-		imports.InsertImportList(unitlocation.Module, unitlocation.Unit, importList, importbooko)
+		imports.InsertImportList(unitlocation.location.Module, unitlocation.location.Unit, importList, importbooko)
 
 		importListString := make([]string, len(importList))
 		for i, importLine := range importList {
 			importListString[i] = location.InformalPath(importLine)
 		}
 		logrus.WithFields(logrus.Fields{
-			"module":  unitlocation.Module,
-			"unit":    unitlocation.Unit,
+			"module":  unitlocation.location.Module,
+			"unit":    unitlocation.location.Unit,
 			"imports": importListString,
 		}).Info("imports taken")
 	}
 	return importbooko
 }
 
-func makeDependencyOrder(locations []*location.UnitLocation, importbooko imports.ImportBook) []string {
+func makeDependencyOrder(locations []*UnitLocationPath, importbooko imports.ImportBook) []string {
 	dependencyGraph := dependency.NewDependencyGraph()
 	// insert nodes
 	for _, unitlocation := range locations {
-		informalPath := location.InformalPath(unitlocation)
+		informalPath := location.InformalPath(unitlocation.location)
 		dependency.InsertNode(informalPath, dependencyGraph)
 	}
 	// connect nodes
 	for _, unitLocation := range locations {
-		importList := imports.LookupImportList(unitLocation.Module, unitLocation.Unit, importbooko)
-		informalDependent := location.InformalPath(unitLocation)
+		importList := imports.LookupImportList(unitLocation.location.Module, unitLocation.location.Unit, importbooko)
+		informalDependent := location.InformalPath(unitLocation.location)
 		for _, importLine := range importList {
 			informalDependency := location.InformalPath(importLine)
 			dependency.AddDependency(informalDependent, informalDependency, dependencyGraph)
 		}
 	}
 
-	return dependency.MakeDependencyOrder(location.InformalPath(locations[0]), dependencyGraph)
+	return dependency.MakeDependencyOrder(location.InformalPath(locations[0].location), dependencyGraph)
 }
 
 func RunFrontEnd(order []string, astbooko astbook.AstBook, importbooko imports.ImportBook, symbolLibrary *symbols.SymbolLibrary) {

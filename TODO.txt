@@ -1,1 +1,6 @@
+Move creating values from syntax tree ("5" = 5, \" -> ") to later stage
 FunctionValue -> FunctionReferenceValue & FunctionValue?
+Right now you can only have 1 version of a library at a time
+- Solution: names of folders will include github tags
+            WILL PROBABLY NOT WORK, project should be homed in single directory
+Make versioning mandatory?

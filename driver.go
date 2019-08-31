@@ -26,5 +26,5 @@ func main() {
 		panic(fmt.Errorf("no module by name %s", module))
 	}
 	outputPath := home.MakeModuleOutput(module)
-	maintool.DoModule(modulePath, outputPath)
+	maintool.DoModule(modulePath, module, outputPath)
 }

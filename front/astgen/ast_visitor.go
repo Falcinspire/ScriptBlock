@@ -1,7 +1,9 @@
 package astgen
 
 import (
+	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/falcinspire/scriptblock/front/ast"
 	"github.com/falcinspire/scriptblock/front/parser"
@@ -247,13 +249,17 @@ func newUnitConvertVisitor() *unitConvertVisitor {
 }
 func (visitor *unitConvertVisitor) EnterUnit(ctx *parser.UnitContext) {
 
-	// do not use visitor for now, only one option
+	// TODO do not use visitor for now, only one option
 
 	iimportContexts := ctx.AllImportLine()
 	importLines := make([]*ast.ImportLine, len(iimportContexts))
 	for i, iimportContext := range iimportContexts {
 		importContext := iimportContext.(*parser.ImportLineContext)
-		importLines[i] = &ast.ImportLine{Module: importContext.IDENTIFIER(0).GetText(), Unit: importContext.IDENTIFIER(1).GetText()}
+		entireString := importContext.STRING().GetText()
+		stringValue := entireString[1 : len(entireString)-1] // TODO crop quotes method? & check this in front end
+		location, module, _, unit := parseImportStatement(stringValue)
+		fmt.Printf("%s %s %s\n", location, module, unit)
+		importLines[i] = &ast.ImportLine{Location: location, Module: module, Unit: unit}
 	}
 
 	definitionContexts := ctx.AllTopDefinition()
@@ -264,4 +270,21 @@ func (visitor *unitConvertVisitor) EnterUnit(ctx *parser.UnitContext) {
 		definitions[i] = topVisitor.Definition
 	}
 	visitor.Unit = ast.NewUnit(importLines, definitions)
+}
+
+func parseImportStatement(stringValue string) (location, module, tag, unit string) {
+	importValue := strings.Replace(stringValue, "/", "\\", -1)
+	pathText := strings.Split(importValue, "\\")
+	location = strings.Join(pathText[0:len(pathText)-2], "\\")
+	moduleSegment := pathText[len(pathText)-2]
+	if strings.Contains(moduleSegment, "#") {
+		moduleSplit := strings.Split(moduleSegment, "#")
+		module = moduleSplit[0]
+		tag = moduleSplit[1]
+	} else {
+		module = moduleSegment
+		tag = ""
+	}
+	unit = pathText[len(pathText)-1]
+	return
 }

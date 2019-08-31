@@ -1,6 +1,8 @@
 package dependency
 
-import "errors"
+import (
+	"errors"
+)
 
 type UnitNode struct {
 	Location     string
