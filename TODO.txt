@@ -4,3 +4,25 @@ Right now you can only have 1 version of a library at a time
 - Solution: names of folders will include github tags
             WILL PROBABLY NOT WORK, project should be homed in single directory
 Make versioning mandatory?
+Import modules as .git repositories?
+Import (library) vs Include (local)?
+Run module dependency order with imports
+Run unit dependency order with includes
+Include/Import snatching? "You don't need to read the entire book to pull out the chapters"
+Go package: 'document'
+
+-------------------------------------------------------------------
+     Document section    |     Front end      |    Back end    
+'document' -> 'pst/ast' -> 'aast (annotated)' -> 'rast (reduced)'
+-------------------------------------------------------------------
+
+Document end --request annotation--> Front end
+Front end --request documents--> Document end
+Back end --request annotated trees--> Front end
+                    or
+                (sort of?)
+Document end --request dependency--> Front end
+Evaluate dependency order
+Document end --provide documents-- Front end
+Front end --provide aasts-- Back end
+Back end --compile--

@@ -1,6 +1,8 @@
 package evaluator
 
 import (
+	"fmt"
+
 	"github.com/falcinspire/scriptblock/back/values"
 	"github.com/falcinspire/scriptblock/front/ast"
 	"github.com/falcinspire/scriptblock/front/location"
@@ -8,6 +10,11 @@ import (
 )
 
 func TranslateFrame(frame *CallFrame, data *EvaluateData) []string {
+
+	// TODO move or not?
+	PushCallStack(frame.Name, data.CallStack)
+	fmt.Println(ListCallStack(data.CallStack))
+
 	mappedArguments := make(map[string]values.Value)
 	for i, parameter := range frame.Parameters {
 		mappedArguments[parameter] = frame.Arguments[i]
@@ -22,6 +29,7 @@ func TranslateFrame(frame *CallFrame, data *EvaluateData) []string {
 		values.NewLocalValueTable(mappedArguments, mappedCaptures),
 		data.ValueLibrary,
 		data.AddressBook,
+		data.CallStack,
 		data.LoopInject,
 		data.ModulePath,
 		data.Output,
@@ -32,6 +40,9 @@ func TranslateFrame(frame *CallFrame, data *EvaluateData) []string {
 	for _, statement := range frame.Body {
 		stringBody = append(stringBody, statementVisitor.QuickVisitStatement(statement)...)
 	}
+
+	PopCallStack(data.CallStack)
+
 	return stringBody
 }
 

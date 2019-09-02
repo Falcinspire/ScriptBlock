@@ -12,6 +12,7 @@ type EvaluateData struct {
 	LocalValues  *values.LocalValueTable
 	ValueLibrary *values.ValueLibrary
 	AddressBook  addressbook.AddressBook
+	CallStack    *CallStack
 	LoopInject   *LoopInject
 	ModulePath   string
 	Output       output.OutputDirectory

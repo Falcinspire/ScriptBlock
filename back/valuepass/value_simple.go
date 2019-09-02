@@ -17,6 +17,7 @@ func ValuePass(unit *ast.Unit, location *location.UnitLocation, valueLibrary *va
 		LocalValues:  nil,
 		ValueLibrary: valueLibrary,
 		AddressBook:  addressBook,
+		CallStack:    evaluator.NewCallStack(),
 		LoopInject:   evaluator.NewLoopInject(),
 		ModulePath:   modulePath,
 		Output:       output,
