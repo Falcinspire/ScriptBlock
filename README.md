@@ -43,4 +43,4 @@ The output of the ScriptBlock compiler is most of what is necessary for a data p
 
 ## What it looks like
 
-[Screenshot](https://github.com/Falcinspire/ScriptBlock/blob/master/screenshot.png)
+![Screenshot](https://github.com/Falcinspire/ScriptBlock/blob/dev/screenshot.png)
