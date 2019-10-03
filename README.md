@@ -19,10 +19,14 @@ NOTE: This command sequence is untested.
 If the bin directory of the go workspace is in the system path, then use is simple:
 ```
 scriptblock <project> 
+```
+i.e.
+```
 scriptblock github.com/Falcinspire/predator
 ```
 If the bin directory of the go workspace is not in the system path, use the same command as above, but with the full path to the scriptblock executable:
-```C:/Program Files/go/bin/scriptblock.exe <project> 
+```
+C:/Program Files/go/bin/scriptblock.exe <project> 
 ```
 NOTE: This form is untested.
 
