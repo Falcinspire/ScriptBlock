@@ -1,12 +1,12 @@
 # ScriptBlock
 
-NOTE: This software is in beta. Development efforts halted upon contributor return to college. Continued efforts are still planned, however.
+NOTE: This software is in beta. Development efforts were halted upon contributor's return to college. Continued efforts are still planned, however.
 
-Scripting Language for Minecraft: Java Edition. Instead of writing a bunch of .mcfunction files, ScriptBlock allows you to write something that looks more like natural code.
+Scripting Language for Minecraft: Java Edition. Instead of writing a bunch of .mcfunction files, ScriptBlock allows you to write something that looks more like traditional code.
 
 ## Installing
 
-This project is not yet available by executable or installer. The only option is to clone to golang project (usually to the go home on your system), and to install it. The master branch is functional, but this tutorial is written for the dev branch, so please check that out before installing. *The master branch uses a different qualified name format; the url prefix is dropped.*
+This project is not yet available by executable or installer. The only option is to clone the golang project (usually to the go home on your system), and to install it. The master branch is functional, but this tutorial is written for the dev branch, so please check that out before installing. *The master branch uses a different qualified name format; the url prefix is dropped.*
 ```
 git clone https://github.com/Falcinspire/ScriptBlock.git
 git checkout dev
@@ -19,10 +19,14 @@ NOTE: This command sequence is untested.
 If the bin directory of the go workspace is in the system path, then use is simple:
 ```
 scriptblock <project> 
+```
+i.e.
+```
 scriptblock github.com/Falcinspire/predator
 ```
 If the bin directory of the go workspace is not in the system path, use the same command as above, but with the full path to the scriptblock executable:
-```C:/Program Files/go/bin/scriptblock.exe <project> 
+```
+C:/Program Files/go/bin/scriptblock.exe <project> 
 ```
 NOTE: This form is untested.
 
