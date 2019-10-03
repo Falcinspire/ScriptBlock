@@ -40,3 +40,7 @@ Project builds are stored in the bin folder, which is adjacent to the src folder
 ## What to do with the output 
 
 The output of the ScriptBlock compiler is most of what is necessary for a data pack. Further instructions will be included later as the project matures.
+
+## What it looks like
+
+[Screenshot](https://github.com/Falcinspire/ScriptBlock/blob/master/screenshot.png)
