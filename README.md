@@ -1,12 +1,12 @@
 # ScriptBlock
 
-NOTE: This software is in beta. Development efforts halted upon contributor return to college. Continued efforts are still planned, however.
+NOTE: This software is in beta. Development efforts were halted upon contributor's return to college. Continued efforts are still planned, however.
 
-Scripting Language for Minecraft: Java Edition. Instead of writing a bunch of .mcfunction files, ScriptBlock allows you to write something that looks more like natural code.
+Scripting Language for Minecraft: Java Edition. Instead of writing a bunch of .mcfunction files, ScriptBlock allows you to write something that looks more like traditional code.
 
 ## Installing
 
-This project is not yet available by executable or installer. The only option is to clone to golang project (usually to the go home on your system), and to install it. The master branch is functional, but this tutorial is written for the dev branch, so please check that out before installing. *The master branch uses a different qualified name format; the url prefix is dropped.*
+This project is not yet available by executable or installer. The only option is to clone the golang project (usually to the go home on your system), and to install it. The master branch is functional, but this tutorial is written for the dev branch, so please check that out before installing. *The master branch uses a different qualified name format; the url prefix is dropped.*
 ```
 git clone https://github.com/Falcinspire/ScriptBlock.git
 git checkout dev
