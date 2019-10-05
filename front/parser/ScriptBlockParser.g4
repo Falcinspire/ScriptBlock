@@ -16,7 +16,7 @@ templateDefinition: documentation? INTERNAL? TEMPLATE IDENTIFIER functionFrame;
 constantDefinition: documentation? INTERNAL? CONSTANT IDENTIFIER EQUALS expression;
 formatter: LESS_THAN IDENTIFIER GREATER_THAN argumentList;
 
-importLine: IMPORT IDENTIFIER COLON IDENTIFIER;
+importLine: IMPORT STRING;
 
 topDefinition
 : constantDefinition NEWLINES #constantDefinitionTop

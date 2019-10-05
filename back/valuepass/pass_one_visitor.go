@@ -8,17 +8,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type TopOneValueVisitor struct {
+type topOneValueVisitor struct {
 	*ast.BaseTopVisitor
 
 	data *evaluator.EvaluateData
 }
 
-func NewOneValueVisitor(data *evaluator.EvaluateData) *TopOneValueVisitor {
-	return &TopOneValueVisitor{nil, data}
+func newOneValueVisitor(data *evaluator.EvaluateData) *topOneValueVisitor {
+	return &topOneValueVisitor{nil, data}
 }
 
-func (visitor *TopOneValueVisitor) VisitFunctionDefinition(definition *ast.FunctionDefinition) {
+func (visitor *topOneValueVisitor) VisitFunctionDefinition(definition *ast.FunctionDefinition) {
 	logrus.WithFields(logrus.Fields{
 		"module": visitor.data.Location.Module,
 		"unit":   visitor.data.Location.Unit,
@@ -34,7 +34,7 @@ func (visitor *TopOneValueVisitor) VisitFunctionDefinition(definition *ast.Funct
 	}
 	table[definition.Name] = value
 }
-func (visitor *TopOneValueVisitor) VisitTemplateDefinition(definition *ast.TemplateDefinition) {
+func (visitor *topOneValueVisitor) VisitTemplateDefinition(definition *ast.TemplateDefinition) {
 	logrus.WithFields(logrus.Fields{
 		"module": visitor.data.Location.Module,
 		"unit":   visitor.data.Location.Unit,
@@ -50,10 +50,9 @@ func (visitor *TopOneValueVisitor) VisitTemplateDefinition(definition *ast.Templ
 	}
 	table[definition.Name] = value
 
-	addresstable := addressbook.LookupAddressTable(visitor.data.Location.Module, visitor.data.Location.Unit, visitor.data.AddressBook)
-	addresstable.Templates[definition.Name] = definition
+	addressbook.InsertTemplateAddress(definition, visitor.data.Location.Module, visitor.data.Location.Unit, definition.Name, visitor.data.AddressBook)
 }
-func (visitor *TopOneValueVisitor) VisitClosureDefinition(definition *ast.ClosureDefinition) {
+func (visitor *topOneValueVisitor) VisitClosureDefinition(definition *ast.ClosureDefinition) {
 	logrus.WithFields(logrus.Fields{
 		"module": visitor.data.Location.Module,
 		"unit":   visitor.data.Location.Unit,
@@ -70,19 +69,18 @@ func (visitor *TopOneValueVisitor) VisitClosureDefinition(definition *ast.Closur
 	}
 	table[definition.Name] = value
 
-	addresstable := addressbook.LookupAddressTable(visitor.data.Location.Module, visitor.data.Location.Unit, visitor.data.AddressBook)
-	addresstable.Closures[definition.Name] = definition
+	addressbook.InsertClosureAddress(definition, visitor.data.Location.Module, visitor.data.Location.Unit, definition.Name, visitor.data.AddressBook)
 }
 
-type UnitOneValueVisitor struct {
+type unitOneValueVisitor struct {
 	data *evaluator.EvaluateData
 }
 
-func NewUnitOneValueVisitor(data *evaluator.EvaluateData) *UnitOneValueVisitor {
-	return &UnitOneValueVisitor{data}
+func newUnitOneValueVisitor(data *evaluator.EvaluateData) *unitOneValueVisitor {
+	return &unitOneValueVisitor{data}
 }
-func (visitor *UnitOneValueVisitor) VisitUnit(unit *ast.Unit) {
+func (visitor *unitOneValueVisitor) VisitUnit(unit *ast.Unit) {
 	for _, definition := range unit.Definitions {
-		definition.Accept(NewOneValueVisitor(visitor.data))
+		definition.Accept(newOneValueVisitor(visitor.data))
 	}
 }

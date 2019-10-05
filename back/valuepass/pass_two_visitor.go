@@ -1,23 +1,23 @@
 package valuepass
 
 import (
-	"github.com/falcinspire/scriptblock/front/ast"
 	"github.com/falcinspire/scriptblock/back/evaluator"
 	"github.com/falcinspire/scriptblock/back/values"
+	"github.com/falcinspire/scriptblock/front/ast"
 	"github.com/sirupsen/logrus"
 )
 
-type TopTwoValueVisitor struct {
+type topTwoValueVisitor struct {
 	*ast.BaseTopVisitor
 
 	data *evaluator.EvaluateData
 }
 
-func NewTopTwoValueVisitor(data *evaluator.EvaluateData) *TopTwoValueVisitor {
-	return &TopTwoValueVisitor{nil, data}
+func newTopTwoValueVisitor(data *evaluator.EvaluateData) *topTwoValueVisitor {
+	return &topTwoValueVisitor{nil, data}
 }
 
-func (visitor *TopTwoValueVisitor) VisitConstantDefinition(definition *ast.ConstantDefinition) {
+func (visitor *topTwoValueVisitor) VisitConstantDefinition(definition *ast.ConstantDefinition) {
 	logrus.WithFields(logrus.Fields{
 		"module": visitor.data.Location.Module,
 		"unit":   visitor.data.Location.Unit,
@@ -34,15 +34,15 @@ func (visitor *TopTwoValueVisitor) VisitConstantDefinition(definition *ast.Const
 	table[definition.Name] = value
 }
 
-type UnitTwoValueVisitor struct {
+type unitTwoValueVisitor struct {
 	data *evaluator.EvaluateData
 }
 
-func NewUnitTwoValueVisitor(data *evaluator.EvaluateData) *UnitTwoValueVisitor {
-	return &UnitTwoValueVisitor{data}
+func newUnitTwoValueVisitor(data *evaluator.EvaluateData) *unitTwoValueVisitor {
+	return &unitTwoValueVisitor{data}
 }
-func (visitor *UnitTwoValueVisitor) VisitUnit(unit *ast.Unit) {
+func (visitor *unitTwoValueVisitor) VisitUnit(unit *ast.Unit) {
 	for _, definition := range unit.Definitions {
-		definition.Accept(NewTopTwoValueVisitor(visitor.data))
+		definition.Accept(newTopTwoValueVisitor(visitor.data))
 	}
 }

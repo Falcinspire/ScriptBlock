@@ -88,7 +88,7 @@ func convertFunctionCall(ctx *parser.FunctionCallContext) *ast.FunctionCall {
 	}
 
 	identifierName := ctx.IDENTIFIER().GetText()
-	return ast.NewFunctionCall(ast.NewIdentifierExpression(identifierName), arguments, trailingFrame)
+	return ast.NewFunctionCall(ast.NewIdentifierExpression(identifierName, convertTokenMetadata(ctx.IDENTIFIER())), arguments, trailingFrame, convertMetadata(ctx))
 }
 
 func convertTag(identifierCtxs []antlr.TerminalNode) ast.Tag {
@@ -106,4 +106,25 @@ func convertDoc(ictx parser.IDocumentationContext) string {
 		docLines[i] = strings.TrimRight(text[3:], "\n\r")
 	}
 	return strings.Join(docLines, "\n")
+}
+
+func convertMetadata(node antlr.ParserRuleContext) *ast.Metadata {
+	return &ast.Metadata{
+		StartLine:   node.GetStart().GetLine(),
+		StartColumn: node.GetStart().GetColumn(),
+		EndLine:     node.GetStop().GetLine(),
+		EndColumn:   node.GetStop().GetColumn() + len(node.GetStop().GetText()),
+		Text:        node.GetText(),
+	}
+}
+
+func convertTokenMetadata(inode antlr.TerminalNode) *ast.Metadata {
+	node := inode.GetSymbol()
+	return &ast.Metadata{
+		StartLine:   node.GetLine(),
+		StartColumn: node.GetColumn(),
+		EndLine:     node.GetLine(),
+		EndColumn:   node.GetColumn() + len(node.GetText()),
+		Text:        node.GetText(),
+	}
 }

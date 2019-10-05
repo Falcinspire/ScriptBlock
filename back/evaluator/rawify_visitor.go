@@ -28,19 +28,6 @@ func (visitor *RawifyValueVisitor) VisitTemplate(templateValue *values.TemplateV
 }
 func (visitor *RawifyValueVisitor) VisitClosure(closureValue *values.ClosureValue) {
 	panic(fmt.Errorf("Cannot reduce a closure reference to a value"))
-
-	//TODO move this elsewhere
-
-	// theClosure := addressbook.AddressClosure(closureValue.Module, closureValue.Unit, closureValue.Name, visitor.addresbook)
-	// injectBody := CompileClosure(theClosure, []values.Value{}, closureValue.Capture, visitor.unitLocation, visitor.valuelibrary, visitor.addresbook, visitor.output)
-
-	// if len(injectBody) > 1 {
-	// 	generatedName := fmt.Sprintf("%s-%s", closureValue.Unit, uuid.New().String())
-	// 	DumpFunction(closureValue.Module, closureValue.Unit, generatedName, injectBody, visitor.output)
-	// 	visitor.Result = fmt.Sprintf("function %s:%s/%s", closureValue.Module, closureValue.Unit, generatedName)
-	// } else {
-	// 	visitor.Result = injectBody[0]
-	// }
 }
 func (visitor *RawifyValueVisitor) VisitClosureReference(closureValue *values.ClosureReferenceValue) {
 	panic(fmt.Errorf("Cannot reduce a closure reference to a value"))

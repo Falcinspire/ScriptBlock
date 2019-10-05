@@ -7,21 +7,18 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type DesugarExpressionVisitor struct {
+type desugarExpressionVisitor struct {
 	*ast.BaseExpressionVisitor
 
 	depth         int
 	freeVariables *freeVariableSet
 }
 
-func NewDesugarExpressionVisitor(depth int, freeVariables *freeVariableSet) *DesugarExpressionVisitor {
-	return &DesugarExpressionVisitor{nil, depth, freeVariables}
+func newDesugarExpressionVisitor(depth int, freeVariables *freeVariableSet) *desugarExpressionVisitor {
+	return &desugarExpressionVisitor{nil, depth, freeVariables}
 }
 
-func (visitor *DesugarExpressionVisitor) VisitIdentifier(identifier *ast.IdentifierExpression) {
-	// capturing identifier
-	// request address to the caller
-	// make the identifier point to enclosed
+func (visitor *desugarExpressionVisitor) VisitIdentifier(identifier *ast.IdentifierExpression) {
 	if identifier.Free {
 		AddToFreeSet(identifier.Address.Data.(*symbols.ParameterAddress), visitor.freeVariables)
 		identifier.Address = symbols.NewCaptureAddressBox(identifier.Address.Data.(*symbols.ParameterAddress).Name)
@@ -29,110 +26,110 @@ func (visitor *DesugarExpressionVisitor) VisitIdentifier(identifier *ast.Identif
 	}
 }
 
-type DesugarStatementVisitor struct {
+type desugarStatementVisitor struct {
 	*ast.BaseStatementVisitor
 
-	injector *FunctionInjector
+	injector *functionInjector
 	rewriter *StatementRewriter
 
 	depth         int
 	freeVariables *freeVariableSet
 }
 
-func NewDesugarStatementVisitor(injector *FunctionInjector, rewriter *StatementRewriter, depth int, freeVariables *freeVariableSet) *DesugarStatementVisitor {
-	return &DesugarStatementVisitor{nil, injector, rewriter, depth, freeVariables}
+func newDesugarStatementVisitor(injector *functionInjector, rewriter *StatementRewriter, depth int, freeVariables *freeVariableSet) *desugarStatementVisitor {
+	return &desugarStatementVisitor{nil, injector, rewriter, depth, freeVariables}
 }
 
-func (visitor *DesugarStatementVisitor) VisitFunctionCall(call *ast.FunctionCall) {
+func (visitor *desugarStatementVisitor) VisitFunctionCall(call *ast.FunctionCall) {
 	for _, argument := range call.Arguments {
-		argument.Accept(NewDesugarExpressionVisitor(visitor.depth, visitor.freeVariables))
+		argument.Accept(newDesugarExpressionVisitor(visitor.depth, visitor.freeVariables))
 	}
 
 	if call.Trailing != nil {
 		trailing := call.Trailing
-		trailingToExpression := DesugarTrailing(&FunctionFrame{trailing.Parameters, trailing.Body}, visitor.injector, visitor.depth, visitor.freeVariables)
+		trailingToExpression := desugarTrailing(&functionFrame{trailing.Parameters, trailing.Body}, visitor.injector, visitor.depth, visitor.freeVariables)
 		call.Arguments = append(call.Arguments, trailingToExpression)
-		call.Trailing = nil // mark this to be removed
+		call.Trailing = nil
 	}
 }
-func (visitor *DesugarStatementVisitor) VisitDelay(call *ast.DelayStatement) {
+func (visitor *desugarStatementVisitor) VisitDelay(call *ast.DelayStatement) {
 	logrus.WithFields(logrus.Fields{
 		"line_local": visitor.rewriter.index,
 	}).Info("rewriting delay call")
 
-	trailingToExpression := DesugarTrailing(&FunctionFrame{[]string{}, call.Body}, visitor.injector, visitor.depth, visitor.freeVariables)
-	call.FunctionCall = ast.NewFunctionCall(trailingToExpression, []ast.Expression{}, nil)
+	trailingToExpression := desugarTrailing(&functionFrame{[]string{}, call.Body}, visitor.injector, visitor.depth, visitor.freeVariables)
+	call.FunctionCall = ast.NewFunctionCall(trailingToExpression, []ast.Expression{}, nil, nil)
 }
 
-func (visitor *DesugarStatementVisitor) VisitNativeCall(call *ast.NativeCall) {
+func (visitor *desugarStatementVisitor) VisitNativeCall(call *ast.NativeCall) {
 	for _, expression := range call.Arguments {
-		expression.Accept(NewDesugarExpressionVisitor(visitor.depth, visitor.freeVariables))
+		expression.Accept(newDesugarExpressionVisitor(visitor.depth, visitor.freeVariables))
 	}
 }
 
-type DesugarTopDefinitionVisitor struct {
+type desugarTopDefinitionVisitor struct {
 	*ast.BaseTopVisitor
 
-	injector *FunctionInjector
+	injector *functionInjector
 }
 
-func NewDesugarTopDefinitionVisitor(injector *FunctionInjector) *DesugarTopDefinitionVisitor {
-	visitor := new(DesugarTopDefinitionVisitor)
+func newDesugarTopDefinitionVisitor(injector *functionInjector) *desugarTopDefinitionVisitor {
+	visitor := new(desugarTopDefinitionVisitor)
 	visitor.injector = injector
 	return visitor
 }
-func (visitor *DesugarTopDefinitionVisitor) VisitFunctionDefinition(definition *ast.FunctionDefinition) {
+func (visitor *desugarTopDefinitionVisitor) VisitFunctionDefinition(definition *ast.FunctionDefinition) {
 	logrus.WithFields(logrus.Fields{
 		"function": definition.Name,
 	}).Info("desugaring")
 
-	frame := &FunctionFrame{make([]string, 0), definition.Body}
+	frame := &functionFrame{make([]string, 0), definition.Body}
 	injector := visitor.injector
 	depth := -1
-	DesugarFunctionFrame(frame, injector, depth)
+	desugarFunctionFrame(frame, injector, depth)
 }
 
-func (visitor *DesugarTopDefinitionVisitor) VisitFunctionShortcutDefinition(shortcut *ast.FunctionShortcutDefinition) {
+func (visitor *desugarTopDefinitionVisitor) VisitFunctionShortcutDefinition(shortcut *ast.FunctionShortcutDefinition) {
 	logrus.WithFields(logrus.Fields{
 		"function-shortcut": shortcut.Name,
 	}).Info("desugaring")
 
-	visitor.injector.ReplaceFunction(shortcut.Name, []ast.Statement{shortcut.FunctionCall}, shortcut.Internal, shortcut.Tag, shortcut.Documentation)
+	visitor.injector.replaceFunction(shortcut.Name, []ast.Statement{shortcut.FunctionCall}, shortcut.Internal, shortcut.Tag, shortcut.Documentation)
 }
 
-func (visitor *DesugarTopDefinitionVisitor) VisitTemplateDefinition(definition *ast.TemplateDefinition) {
+func (visitor *desugarTopDefinitionVisitor) VisitTemplateDefinition(definition *ast.TemplateDefinition) {
 	logrus.WithFields(logrus.Fields{
 		"template": definition.Name,
 	}).Info("desugaring")
 
-	frame := &FunctionFrame{definition.Parameters, definition.Body}
+	frame := &functionFrame{definition.Parameters, definition.Body}
 	injector := visitor.injector
 	depth := -1
-	DesugarFunctionFrame(frame, injector, depth)
+	desugarFunctionFrame(frame, injector, depth)
 }
 
-func (visitor *DesugarTopDefinitionVisitor) VisitConstantDefinition(definition *ast.ConstantDefinition) {
+func (visitor *desugarTopDefinitionVisitor) VisitConstantDefinition(definition *ast.ConstantDefinition) {
 	logrus.WithFields(logrus.Fields{
 		"constant": definition.Name,
 	}).Info("desugaring")
 
 	expression := definition.Value
-	DesugarExpressionFrame(expression)
+	desugarExpressionFrame(expression)
 }
 
-type DesugarUnitVisitor struct {
+type desugarUnitVisitor struct {
 	unit     *ast.Unit
 	location *location.UnitLocation
 }
 
-func NewDesugarUnitVisitor(unit *ast.Unit, location *location.UnitLocation) *DesugarUnitVisitor {
-	visitor := new(DesugarUnitVisitor)
+func newDesugarUnitVisitor(unit *ast.Unit, location *location.UnitLocation) *desugarUnitVisitor {
+	visitor := new(desugarUnitVisitor)
 	visitor.unit = unit
 	visitor.location = location
 	return visitor
 }
-func (visitor *DesugarUnitVisitor) VisitUnit(unit *ast.Unit) {
+func (visitor *desugarUnitVisitor) VisitUnit(unit *ast.Unit) {
 	for i, definition := range unit.Definitions {
-		definition.Accept(NewDesugarTopDefinitionVisitor(NewFunctionInjector(visitor.unit, visitor.location, i)))
+		definition.Accept(newDesugarTopDefinitionVisitor(newFunctionInjector(visitor.unit, visitor.location, i)))
 	}
 }

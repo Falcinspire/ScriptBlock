@@ -7,17 +7,12 @@ type FunctionDefinition struct {
 	Internal      bool
 	Tag           Tag
 	Documentation string
+	Metadata      *Metadata
 }
 
 // NewFunctionDefinition is a constructor for FunctionDefinition
-func NewFunctionDefinition(name string, body []Statement, internal bool, tag Tag, docs string) *FunctionDefinition {
-	definition := new(FunctionDefinition)
-	definition.Name = name
-	definition.Body = body
-	definition.Internal = internal
-	definition.Tag = tag
-	definition.Documentation = docs
-	return definition
+func NewFunctionDefinition(name string, body []Statement, internal bool, tag Tag, docs string, metadata *Metadata) *FunctionDefinition {
+	return &FunctionDefinition{name, body, internal, tag, docs, metadata}
 }
 
 // Accept runs the double dispatch for the visitor
@@ -36,17 +31,13 @@ type FunctionShortcutDefinition struct {
 	Internal      bool
 	Tag           Tag
 	Documentation string
+
+	Metadata *Metadata
 }
 
 // NewFunctionShortcutDefinition is a constructor for FunctionShortcutDefinition
-func NewFunctionShortcutDefinition(name string, functionCall *FunctionCall, internal bool, tag Tag, docs string) *FunctionShortcutDefinition {
-	definition := new(FunctionShortcutDefinition)
-	definition.Name = name
-	definition.FunctionCall = functionCall
-	definition.Internal = internal
-	definition.Tag = tag
-	definition.Documentation = docs
-	return definition
+func NewFunctionShortcutDefinition(name string, functionCall *FunctionCall, internal bool, tag Tag, docs string, metadata *Metadata) *FunctionShortcutDefinition {
+	return &FunctionShortcutDefinition{name, functionCall, internal, tag, docs, metadata}
 }
 
 // Accept runs the double dispatch for the visitor
@@ -61,17 +52,12 @@ type TemplateDefinition struct {
 	Body          []Statement
 	Internal      bool
 	Documentation string
+	Metadata      *Metadata
 }
 
 // NewTemplateDefinition is a constructor for TemplateDefinition
-func NewTemplateDefinition(name string, parameters []string, body []Statement, internal bool, docs string) *TemplateDefinition {
-	definition := new(TemplateDefinition)
-	definition.Name = name
-	definition.Parameters = parameters
-	definition.Body = body
-	definition.Internal = internal
-	definition.Documentation = docs
-	return definition
+func NewTemplateDefinition(name string, parameters []string, body []Statement, internal bool, docs string, metadata *Metadata) *TemplateDefinition {
+	return &TemplateDefinition{name, parameters, body, internal, docs, metadata}
 }
 
 // Accept runs the double dispatch for the visitor
@@ -86,11 +72,12 @@ type ClosureDefinition struct {
 	Capture    []string
 	Body       []Statement
 	Internal   bool
+	Metadata   *Metadata
 }
 
 // NewClosureDefinition is a constructor for ClosureDefinition
-func NewClosureDefinition(name string, parameters []string, capture []string, body []Statement, internal bool) *ClosureDefinition {
-	return &ClosureDefinition{name, parameters, capture, body, internal}
+func NewClosureDefinition(name string, parameters []string, capture []string, body []Statement, internal bool, metadata *Metadata) *ClosureDefinition {
+	return &ClosureDefinition{name, parameters, capture, body, internal, metadata}
 }
 
 // Accept runs the double dispatch for the visitor
@@ -102,4 +89,5 @@ func (definition *ClosureDefinition) Accept(visitor TopVisitor) {
 type Tag struct {
 	Namespace string
 	Identity  string
+	Metadata  *Metadata
 }

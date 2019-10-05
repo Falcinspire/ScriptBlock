@@ -1,14 +1,15 @@
-package evaluator
+package dumper
 
 import (
 	"fmt"
 	"os"
 	"path/filepath"
 
+	"github.com/falcinspire/scriptblock/back/output"
 	"github.com/sirupsen/logrus"
 )
 
-func DumpFunction(module string, unit string, name string, lines []string, output OutputDirectory) {
+func DumpFunction(module string, unit string, name string, lines []string, output output.OutputDirectory) {
 	path := fmt.Sprintf("%s/%s/functions/%s/%s.mcfunction", output, module, unit, name)
 
 	logrus.WithFields(logrus.Fields{

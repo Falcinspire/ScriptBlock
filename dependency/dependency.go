@@ -1,6 +1,8 @@
 package dependency
 
-import "errors"
+import (
+	"errors"
+)
 
 type UnitNode struct {
 	Location     string
@@ -35,9 +37,12 @@ const (
 	RESOLVED  = 1
 )
 
-func MakeDependencyOrder(root string, graph *DependencyGraph) []string {
-	rootNode := GetNode(root, graph)
-	order := dependencyRecursive(rootNode, []string{}, make(map[string]VisitState), graph)
+func MakeDependencyOrder(graph *DependencyGraph) []string {
+	order := []string{}
+	used := make(map[string]VisitState)
+	for _, node := range graph.Nodes {
+		order = dependencyRecursive(node, order, used, graph)
+	}
 	return order
 }
 

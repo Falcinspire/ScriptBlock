@@ -1,22 +1,26 @@
 package resolver
 
 import (
+	"encoding/json"
 	"fmt"
 
+	"github.com/falcinspire/scriptblock/front/ast"
 	"github.com/falcinspire/scriptblock/front/imports"
 	"github.com/falcinspire/scriptblock/front/location"
 	"github.com/falcinspire/scriptblock/front/symbols"
 )
 
 type ResolveError struct {
-	name string
+	name     string
+	metadata *ast.Metadata
 }
 
-func NewResolveError(symbol string) ResolveError {
-	return ResolveError{symbol}
+func NewResolveError(symbol string, metadata *ast.Metadata) ResolveError {
+	return ResolveError{symbol, metadata}
 }
 func (this ResolveError) Error() string {
-	return fmt.Sprintf("Cannot resolve \"%s\"", this.name)
+	data, _ := json.Marshal(this.metadata)
+	return fmt.Sprintf("Cannot resolve \"%s\", %s", this.name, string(data))
 }
 
 type ResolveEnvironment struct {
@@ -26,7 +30,7 @@ type ResolveEnvironment struct {
 	imported     []symbols.SymbolTable
 }
 
-func CreateResolveEnvironment(unitLocation *location.UnitLocation, symbollibrary symbols.SymbolLibrary, importbook imports.ImportBook) *ResolveEnvironment {
+func CreateResolveEnvironment(unitLocation *location.UnitLocation, symbollibrary *symbols.SymbolLibrary, importbook imports.ImportBook) *ResolveEnvironment {
 	internal := symbols.LookupSymbolTable(unitLocation.Module, unitLocation.Unit, symbollibrary.Internal)
 	exported := symbols.LookupSymbolTable(unitLocation.Module, unitLocation.Unit, symbollibrary.Exported)
 	usedImports := imports.LookupImportList(unitLocation.Module, unitLocation.Unit, importbook)
