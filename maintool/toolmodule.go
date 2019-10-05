@@ -126,6 +126,13 @@ func takeImportsFromAsts(astbooko astbook.AstBook, locations []*UnitLocationPath
 }
 
 func makeDependencyOrder(locations []*UnitLocationPath, importbooko imports.ImportBook) []string {
+	//TODO make output one line
+	for _, alocation := range locations {
+		logrus.WithFields(logrus.Fields{
+			"input": location.InformalPath(alocation.location),
+		}).Info("Dependency input")
+	}
+
 	dependencyGraph := dependency.NewDependencyGraph()
 	// insert nodes
 	for _, unitlocation := range locations {
@@ -142,7 +149,7 @@ func makeDependencyOrder(locations []*UnitLocationPath, importbooko imports.Impo
 		}
 	}
 
-	return dependency.MakeDependencyOrder(location.InformalPath(locations[0].location), dependencyGraph)
+	return dependency.MakeDependencyOrder(dependencyGraph)
 }
 
 func RunFrontEnd(order []string, astbooko astbook.AstBook, importbooko imports.ImportBook, symbolLibrary *symbols.SymbolLibrary) {
