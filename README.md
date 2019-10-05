@@ -36,6 +36,26 @@ The language workspace is modelled after Golang. There is a central workspace th
 Projects will have a name and a path. Together, the name and the path make up the qualified name, which will be used for `import` statements and project structure. The qualified name is planned to eventually include a version number/code as well. This is to eventually make using libraries trivial. 
 An example qualified name is `github.com/Falcinspire/predator`. This project would have the name "predator" and be stored at  `https:/github.com/Falcinspire/predator`. In a local workspace, this would be stored at `%ScriptBlockPath%/src/github.com/Falcinspire/predator`.
 Project builds are stored in the bin folder, which is adjacent to the src folder. 
+Example:
+
+    %ScriptBlockPath%
+        ├── src                                            
+        |   ├─ github.com                                  
+        |       ├── falcinspire                          
+        |            ├── predator                         
+        |                ├── test.sb                 
+        |                ├── helper.sb                   
+        |                ├── zombie.json                   
+        ├── bin                                           
+            ├─ github.com                
+                ├── falcinspire
+                     ├── predator                         
+                         ├── (namespace)
+                              ├── functions
+                                   ├── *.mcfunction
+                         ├── (namespace)
+                              ├── functions
+                                   ├── *.mcfunction
 
 ## What to do with the output 
 
