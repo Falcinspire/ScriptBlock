@@ -11,6 +11,7 @@ import (
 	"github.com/falcinspire/scriptblock/home"
 )
 
+// BUG: works first time, but cannot be run twice on same input without failing
 func Download(data environment.ModuleDescription) { //TODO maybe make ModuleDescription a pointer
 	home.MakeModulePath(data)
 	fmt.Println("Cloning " + "https://" + data.Location)
@@ -20,7 +21,14 @@ func Download(data environment.ModuleDescription) { //TODO maybe make ModuleDesc
 	if err != nil {
 		log.Fatal(err)
 	}
-	// TODO checkout version
+	if data.Version != "latest" {
+		versionCmd := exec.Command("git", "checkout", "tags/"+data.Version)
+		versionCmd.Dir = environment.GetModulePath(data)
+		versionErr := versionCmd.Run()
+		if versionErr != nil {
+			log.Fatal(err)
+		}
+	}
 	gitHome := filepath.Join(environment.GetModulePath(data), ".git")
 	fmt.Println("Deleting " + gitHome)
 	os.RemoveAll(gitHome)
