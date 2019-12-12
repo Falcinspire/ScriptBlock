@@ -257,9 +257,9 @@ func (visitor *unitConvertVisitor) EnterUnit(ctx *parser.UnitContext) {
 		importContext := iimportContext.(*parser.ImportLineContext)
 		entireString := importContext.STRING().GetText()
 		stringValue := entireString[1 : len(entireString)-1] // TODO crop quotes method? & check this in front end
-		location, module, _, unit := parseImportStatement(stringValue)
-		fmt.Printf("%s %s %s\n", location, module, unit)
-		importLines[i] = &ast.ImportLine{Location: location, Module: module, Unit: unit}
+		module, unit := parseImportStatement(stringValue)
+		fmt.Printf("%s %s\n", module, unit) // TODO replace with log or delete
+		importLines[i] = &ast.ImportLine{Location: "", Module: module, Unit: unit}
 	}
 
 	definitionContexts := ctx.AllTopDefinition()
@@ -272,19 +272,24 @@ func (visitor *unitConvertVisitor) EnterUnit(ctx *parser.UnitContext) {
 	visitor.Unit = ast.NewUnit(importLines, definitions)
 }
 
-func parseImportStatement(stringValue string) (location, module, tag, unit string) {
-	importValue := strings.Replace(stringValue, "/", "\\", -1)
-	pathText := strings.Split(importValue, "\\")
-	location = strings.Join(pathText[0:len(pathText)-2], "\\")
-	moduleSegment := pathText[len(pathText)-2]
-	if strings.Contains(moduleSegment, "#") {
-		moduleSplit := strings.Split(moduleSegment, "#")
-		module = moduleSplit[0]
-		tag = moduleSplit[1]
-	} else {
-		module = moduleSegment
-		tag = ""
-	}
-	unit = pathText[len(pathText)-1]
-	return
+func parseImportStatement(stringValue string) (module string, unit string) {
+	data := strings.Split(stringValue, ":")
+	return data[0], data[1]
 }
+
+// func parseImportStatement(stringValue string) (location, module, tag, unit string) {
+// 	importValue := strings.Replace(stringValue, "/", "\\", -1)
+// 	pathText := strings.Split(importValue, "\\")
+// 	location = strings.Join(pathText[0:len(pathText)-2], "\\")
+// 	moduleSegment := pathText[len(pathText)-2]
+// 	if strings.Contains(moduleSegment, "#") {
+// 		moduleSplit := strings.Split(moduleSegment, "#")
+// 		module = moduleSplit[0]
+// 		tag = moduleSplit[1]
+// 	} else {
+// 		module = moduleSegment
+// 		tag = ""
+// 	}
+// 	unit = pathText[len(pathText)-1]
+// 	return
+// }

@@ -12,6 +12,7 @@ import (
 )
 
 // BUG: works first time, but cannot be run twice on same input without failing
+// git clone probably fails bc folder is not empty
 func Download(data environment.ModuleDescription) { //TODO maybe make ModuleDescription a pointer
 	home.MakeModulePath(data)
 	fmt.Println("Cloning " + "https://" + data.Location)

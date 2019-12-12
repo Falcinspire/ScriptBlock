@@ -1,62 +1,63 @@
 package dependency
 
-import (
-	"errors"
-)
-
-type UnitNode struct {
-	Location     string
-	Dependencies []*UnitNode
-}
-
 type DependencyGraph struct {
-	Nodes map[string]*UnitNode
+	N     int
+	Nodes [][]int
 }
 
-func NewDependencyGraph() *DependencyGraph {
-	return &DependencyGraph{make(map[string]*UnitNode)}
+func NewDependencyGraph(size int) DependencyGraph {
+	graph := DependencyGraph{size, make([][]int, size)}
+	for i := 0; i < size; i++ {
+		graph.Nodes[i] = make([]int, 0)
+	}
+	return graph
 }
 
-func InsertNode(location string, graph *DependencyGraph) {
-	node := &UnitNode{location, make([]*UnitNode, 0)}
-	graph.Nodes[location] = node
-}
-func AddDependency(unit, dependency string, graph *DependencyGraph) {
-	unitNode := graph.Nodes[unit]
-	dependencyNode := graph.Nodes[dependency]
-	unitNode.Dependencies = append(unitNode.Dependencies, dependencyNode)
-}
-func GetNode(name string, graph *DependencyGraph) *UnitNode {
-	return graph.Nodes[name]
+func AddDependency(src, depends int, graph DependencyGraph) {
+	graph.Nodes[src] = append(graph.Nodes[src], depends)
 }
 
 type VisitState int
 
 const (
-	RESOLVING = 0
-	RESOLVED  = 1
+	UNSEEN    = 0
+	RESOLVING = 1
+	RESOLVED  = 2
 )
 
-func MakeDependencyOrder(graph *DependencyGraph) []string {
-	order := []string{}
-	used := make(map[string]VisitState)
-	for _, node := range graph.Nodes {
-		order = dependencyRecursive(node, order, used, graph)
-	}
-	return order
-}
-
-func dependencyRecursive(node *UnitNode, order []string, used map[string]VisitState, graph *DependencyGraph) (orderNew []string) {
-	used[node.Location] = RESOLVING
-	for _, dependsOn := range node.Dependencies {
-		state, exists := used[dependsOn.Location]
-		if !exists {
-			order = dependencyRecursive(dependsOn, order, used, graph)
-		} else if state == RESOLVING {
-			panic(errors.New("Circular Reference"))
+func MakeDependencyOrder(graph DependencyGraph) (order []int, circular bool) {
+	order = make([]int, 0)
+	used := make([]VisitState, graph.N)
+	for i := 0; i < graph.N; i++ {
+		order, circular = dependencyRecursive(i, order, used, graph)
+		if circular {
+			order = make([]int, 0)
+			return
 		}
 	}
-	order = append(order, node.Location)
-	used[node.Location] = RESOLVED
-	return order
+	return
+}
+
+func dependencyRecursive(src int, order []int, used []VisitState, graph DependencyGraph) (orderNew []int, circular bool) {
+	if used[src] == RESOLVED {
+		return order, false
+	}
+
+	used[src] = RESOLVING
+	for _, dependsOn := range graph.Nodes[src] {
+		if used[dependsOn] == UNSEEN {
+			order, circular = dependencyRecursive(dependsOn, order, used, graph)
+			if circular {
+				order = make([]int, 0)
+				return
+			}
+		} else if used[dependsOn] == RESOLVING {
+			order = make([]int, 0)
+			circular = true
+			return
+		}
+	}
+	order = append(order, src)
+	used[src] = RESOLVED
+	return order, false
 }

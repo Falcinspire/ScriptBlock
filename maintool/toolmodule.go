@@ -133,7 +133,9 @@ func makeDependencyOrder(locations []*UnitLocationPath, importbooko imports.Impo
 		}).Info("Dependency input")
 	}
 
-	dependencyGraph := dependency.NewDependencyGraph()
+	// TODO fix this to work with module:unit format instead of filepath format
+
+	dependencyGraph := dependency.NewDependencyGraph(len(locations))
 	// insert nodes
 	for _, unitlocation := range locations {
 		informalPath := location.InformalPath(unitlocation.location)

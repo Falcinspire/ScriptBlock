@@ -23,7 +23,9 @@ func main() {
 	subcommand := os.Args[1]
 
 	if subcommand == "build" {
-		module := os.Args[2]
+		modulePrefix := os.Args[2]
+		version := os.Args[3]
+		module := filepath.Join(modulePrefix, version)
 		modulePath, exists := home.FindModuleInHome(module)
 		if !exists {
 			panic(fmt.Errorf("no module by name %s", module))
