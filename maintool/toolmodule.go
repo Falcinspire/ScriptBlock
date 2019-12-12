@@ -1,6 +1,7 @@
 package maintool
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -44,44 +45,45 @@ func DoModule(globalPath string, modulePath string, output output.OutputDirector
 		panic(err)
 	}
 
-	locations := registerLocations(files, globalPath, filepath.Dir(modulePath), filepath.Base(modulePath))
-	astbooko := parseAllToAsts(locations)
-	importbooko := takeImportsFromAsts(astbooko, locations)
+	moduleName := filepath.Base(modulePath)
+	locations := registerLocations(files, moduleName)
+	astbooko := parseAllToAsts(locations, moduleName, modulePath)
+	importbooko := takeImportsFromAsts(locations, moduleName, astbooko)
 	symbollibrary := symbols.NewSymbolLibrary()
-	order := makeDependencyOrder(locations, importbooko)
+	order := makeDependencyOrder(locations, moduleName, importbooko)
 
 	logrus.WithFields(logrus.Fields{
 		"order": order,
 	}).Info("dependency order produced")
 
-	RunFrontEnd(order, astbooko, importbooko, symbollibrary)
+	RunFrontEnd(order, moduleName, astbooko, importbooko, symbollibrary)
 
 	valuelibrary := values.NewValueLibrary()
 	addressbooko := addressbook.NewAddressBook()
 
 	theTags := make(map[string]tags.LocationList)
 
-	RunBackEnd(order, astbooko, valuelibrary, addressbooko, theTags, globalPath, output)
+	RunBackEnd(order, moduleName, astbooko, valuelibrary, addressbooko, theTags, globalPath, output)
 
 	tags.WriteAllTagsToFiles(theTags, output)
 }
 
-func registerLocations(files []os.FileInfo, modulePath, moduleLocation, moduleFolder string) []*UnitLocationPath {
-	locations := make([]*UnitLocationPath, 0)
+func registerLocations(files []os.FileInfo, moduleName string) []string {
+	locations := make([]string, 0)
 
 	for _, file := range files {
 		if filepath.Ext(file.Name()) == ".sb" {
 			unitName := strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
-			locations = append(locations, &UnitLocationPath{location.NewUnitLocation(moduleLocation, moduleFolder, unitName), filepath.Join(modulePath, file.Name())})
+			locations = append(locations, unitName)
 
 			logrus.WithFields(logrus.Fields{
-				"module": moduleFolder,
+				"module": moduleName,
 				"unit":   unitName,
 			}).Info("identified unit")
 		} else {
 			logrus.WithFields(logrus.Fields{
-				"module": moduleFolder,
-				"unit":   file.Name(),
+				"module": moduleName,
+				"file":   file.Name(),
 			}).Info("skipping non-unit")
 		}
 	}
@@ -89,91 +91,95 @@ func registerLocations(files []os.FileInfo, modulePath, moduleLocation, moduleFo
 	return locations
 }
 
-func parseAllToAsts(locations []*UnitLocationPath) astbook.AstBook {
+func parseAllToAsts(units []string, moduleName string, modulePath string) astbook.AstBook {
 	astbooko := astbook.NewAstBook()
-	for _, unitlocation := range locations {
-		pstree := parser.Parse(unitlocation.filepath)
+	for _, unitName := range units {
+		filelocation := filepath.Join(modulePath, unitName, ".sb")
+		pstree := parser.Parse(filelocation)
 		astree := astgen.PSTtoAST(pstree)
-		astbook.InsertAst(unitlocation.location, astree, astbooko)
+		astbook.InsertAst(&location.UnitLocation{"", moduleName, unitName}, astree, astbooko)
 
 		logrus.WithFields(logrus.Fields{
-			"module": unitlocation.location.Module,
-			"unit":   unitlocation.location.Unit,
-			"path":   unitlocation.filepath,
+			"module": moduleName,
+			"unit":   unitName,
+			"path":   filelocation,
 		}).Info("ast produced")
 	}
 	return astbooko
 }
 
-func takeImportsFromAsts(astbooko astbook.AstBook, locations []*UnitLocationPath) imports.ImportBook {
+func takeImportsFromAsts(units []string, module string, astbooko astbook.AstBook) imports.ImportBook {
 	importbooko := imports.NewImportBook()
-	for _, unitlocation := range locations {
-		astree := astbook.LookupAst(unitlocation.location, astbooko)
+	for _, unitName := range units {
+		astree := astbook.LookupAst(&location.UnitLocation{"", module, unitName}, astbooko)
 		importList := imports.TakeImports(astree)
-		imports.InsertImportList(unitlocation.location.Module, unitlocation.location.Unit, importList, importbooko)
+		imports.InsertImportList(module, unitName, importList, importbooko)
 
 		importListString := make([]string, len(importList))
 		for i, importLine := range importList {
 			importListString[i] = location.InformalPath(importLine)
 		}
 		logrus.WithFields(logrus.Fields{
-			"module":  unitlocation.location.Module,
-			"unit":    unitlocation.location.Unit,
+			"module":  module,
+			"unit":    unitName,
 			"imports": importListString,
 		}).Info("imports taken")
 	}
 	return importbooko
 }
 
-func makeDependencyOrder(locations []*UnitLocationPath, importbooko imports.ImportBook) []string {
-	//TODO make output one line
-	for _, alocation := range locations {
-		logrus.WithFields(logrus.Fields{
-			"input": location.InformalPath(alocation.location),
-		}).Info("Dependency input")
+func makeDependencyOrder(units []string, module string, importbooko imports.ImportBook) []string {
+
+	logrus.WithFields(logrus.Fields{
+		"input": units,
+	})
+
+	toId := make(map[string]int)
+	for unitId, unitName := range units {
+		toId[unitName] = unitId
 	}
 
-	// TODO fix this to work with module:unit format instead of filepath format
+	dependencyGraph := dependency.NewDependencyGraph(len(units))
 
-	dependencyGraph := dependency.NewDependencyGraph(len(locations))
-	// insert nodes
-	for _, unitlocation := range locations {
-		informalPath := location.InformalPath(unitlocation.location)
-		dependency.InsertNode(informalPath, dependencyGraph)
-	}
 	// connect nodes
-	for _, unitLocation := range locations {
-		importList := imports.LookupImportList(unitLocation.location.Module, unitLocation.location.Unit, importbooko)
-		informalDependent := location.InformalPath(unitLocation.location)
+	for unitId, unitName := range units {
+		importList := imports.LookupImportList(module, unitName, importbooko)
 		for _, importLine := range importList {
-			informalDependency := location.InformalPath(importLine)
-			dependency.AddDependency(informalDependent, informalDependency, dependencyGraph)
+			dependency.AddDependency(unitId, toId[importLine.Unit], dependencyGraph)
 		}
 	}
 
-	return dependency.MakeDependencyOrder(dependencyGraph)
+	idOrder, circular := dependency.MakeDependencyOrder(dependencyGraph)
+	if circular {
+		panic(fmt.Errorf("circular reference"))
+	}
+
+	order := make([]string, len(units))
+	for index, id := range idOrder {
+		order[index] = units[id]
+	}
+
+	return order
 }
 
-func RunFrontEnd(order []string, astbooko astbook.AstBook, importbooko imports.ImportBook, symbolLibrary *symbols.SymbolLibrary) {
-	for _, informalLocation := range order {
-		unitLocation := location.LocationFromInformal(informalLocation)
-		DoUnitFront(unitLocation, astbooko, importbooko, symbolLibrary)
+func RunFrontEnd(order []string, module string, astbooko astbook.AstBook, importbooko imports.ImportBook, symbolLibrary *symbols.SymbolLibrary) {
+	for _, unitName := range order {
+		DoUnitFront(&location.UnitLocation{"", module, unitName}, astbooko, importbooko, symbolLibrary)
 
 		logrus.WithFields(logrus.Fields{
-			"module": unitLocation.Module,
-			"unit":   unitLocation.Unit,
+			"module": module,
+			"unit":   unitName,
 		}).Info("front end run on unit")
 	}
 }
 
-func RunBackEnd(order []string, astbooko astbook.AstBook, valueLibrary *values.ValueLibrary, addressbooko addressbook.AddressBook, theTags map[string]tags.LocationList, modulePath string, output output.OutputDirectory) {
-	for _, informalLocation := range order {
-		unitLocation := location.LocationFromInformal(informalLocation)
-		DoUnitBack(unitLocation, astbooko, valueLibrary, addressbooko, theTags, modulePath, output)
+func RunBackEnd(order []string, module string, astbooko astbook.AstBook, valueLibrary *values.ValueLibrary, addressbooko addressbook.AddressBook, theTags map[string]tags.LocationList, modulePath string, output output.OutputDirectory) {
+	for _, unitName := range order {
+		DoUnitBack(&location.UnitLocation{"", module, unitName}, astbooko, valueLibrary, addressbooko, theTags, modulePath, output)
 
 		logrus.WithFields(logrus.Fields{
-			"module": unitLocation.Module,
-			"unit":   unitLocation.Unit,
+			"module": module,
+			"unit":   unitName,
 		}).Info("back end run on unit")
 	}
 }
