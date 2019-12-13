@@ -1,19 +1,19 @@
 package dependency
 
 type DependencyGraph struct {
-	N     int
 	Nodes [][]int
 }
 
-func NewDependencyGraph(size int) DependencyGraph {
-	graph := DependencyGraph{size, make([][]int, size)}
-	for i := 0; i < size; i++ {
-		graph.Nodes[i] = make([]int, 0)
-	}
-	return graph
+func NewDependencyGraph() *DependencyGraph {
+	return &DependencyGraph{make([][]int, 0)}
 }
 
-func AddDependency(src, depends int, graph DependencyGraph) {
+func AddVertex(graph *DependencyGraph) int {
+	graph.Nodes = append(graph.Nodes, make([]int, 0))
+	return len(graph.Nodes) - 1
+}
+
+func AddDependency(src, depends int, graph *DependencyGraph) {
 	graph.Nodes[src] = append(graph.Nodes[src], depends)
 }
 
@@ -25,10 +25,10 @@ const (
 	RESOLVED  = 2
 )
 
-func MakeDependencyOrder(graph DependencyGraph) (order []int, circular bool) {
+func MakeDependencyOrder(graph *DependencyGraph) (order []int, circular bool) {
 	order = make([]int, 0)
-	used := make([]VisitState, graph.N)
-	for i := 0; i < graph.N; i++ {
+	used := make([]VisitState, len(graph.Nodes))
+	for i := 0; i < len(graph.Nodes); i++ {
 		order, circular = dependencyRecursive(i, order, used, graph)
 		if circular {
 			order = make([]int, 0)
@@ -38,7 +38,7 @@ func MakeDependencyOrder(graph DependencyGraph) (order []int, circular bool) {
 	return
 }
 
-func dependencyRecursive(src int, order []int, used []VisitState, graph DependencyGraph) (orderNew []int, circular bool) {
+func dependencyRecursive(src int, order []int, used []VisitState, graph *DependencyGraph) (orderNew []int, circular bool) {
 	if used[src] == RESOLVED {
 		return order, false
 	}

@@ -28,13 +28,15 @@ type UnitLocationPath struct {
 	filepath string
 }
 
-func DoModule(modulePath string, moduleQualified, output output.OutputDirectory) {
+func DoModule(moduleQualified string, scriptblockHome string, output output.OutputDirectory) {
 
 	// this could be dangerous if given wrong directory
 	// if _, err := os.Stat(output); !os.IsNotExist(err) {
 	// 	os.RemoveAll(output)
 	// 	os.MkdirAll(output, os.ModePerm)
 	// }
+
+	modulePath := filepath.Join(scriptblockHome, moduleQualified)
 
 	logrus.WithFields(logrus.Fields{
 		"module": modulePath,
@@ -140,7 +142,10 @@ func makeDependencyOrder(units []string, module string, importbooko imports.Impo
 		toId[unitName] = unitId
 	}
 
-	dependencyGraph := dependency.NewDependencyGraph(len(units))
+	dependencyGraph := dependency.NewDependencyGraph()
+	for i := 0; i < len(units); i++ {
+		dependency.AddVertex(dependencyGraph)
+	}
 
 	// connect nodes
 	for unitId, unitName := range units {

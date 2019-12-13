@@ -26,12 +26,12 @@ func main() {
 		modulePrefix := os.Args[2]
 		version := os.Args[3]
 		module := filepath.Join(modulePrefix, version)
-		modulePath, exists := home.FindModuleInHome(module)
+		_, exists := home.FindModuleInHome(module) // TODO remove redundancy
 		if !exists {
 			panic(fmt.Errorf("no module by name %s", module))
 		}
 		outputPath := home.MakeModuleOutput(module)
-		maintool.DoModule(modulePath, module, outputPath)
+		maintool.DoProject(module, outputPath)
 	} else if subcommand == "home" {
 		fmt.Println(environment.GetHomePath())
 	} else if subcommand == "config" {
