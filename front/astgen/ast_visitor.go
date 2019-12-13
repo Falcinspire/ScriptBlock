@@ -259,7 +259,7 @@ func (visitor *unitConvertVisitor) EnterUnit(ctx *parser.UnitContext) {
 		stringValue := entireString[1 : len(entireString)-1] // TODO crop quotes method? & check this in front end
 		module, unit := parseImportStatement(stringValue)
 		fmt.Printf("%s %s\n", module, unit) // TODO replace with log or delete
-		importLines[i] = &ast.ImportLine{Location: "", Module: module, Unit: unit}
+		importLines[i] = &ast.ImportLine{Module: module, Unit: unit}
 	}
 
 	definitionContexts := ctx.AllTopDefinition()

@@ -43,7 +43,7 @@ func (visitor *InvokeValueVisitor) VisitTemplate(templateValue *values.TemplateV
 	}).Info("invoking template")
 
 	theTemplate := addressbook.AddressTemplate(templateValue.Module, templateValue.Unit, templateValue.Name, visitor.data.AddressBook)
-	injectBody := TranslateTemplate(theTemplate, visitor.arguments, location.NewUnitLocation("", templateValue.Module, templateValue.Unit), visitor.data) // TODO make this different location?
+	injectBody := TranslateTemplate(theTemplate, visitor.arguments, location.NewUnitLocation(templateValue.Module, templateValue.Unit), visitor.data) // TODO make this different location?
 
 	visitor.Result = NewLinesInvokeResult(injectBody)
 }
@@ -55,7 +55,7 @@ func (visitor *InvokeValueVisitor) VisitClosure(closureValue *values.ClosureValu
 
 	closureReference := closureValue.Callee
 	theClosure := addressbook.AddressClosure(closureReference.Module, closureReference.Unit, closureReference.Name, visitor.data.AddressBook)
-	injectBody := TranslateClosure(theClosure, visitor.arguments, location.NewUnitLocation("", closureReference.Module, closureReference.Unit), closureValue.Capture, visitor.data)
+	injectBody := TranslateClosure(theClosure, visitor.arguments, location.NewUnitLocation(closureReference.Module, closureReference.Unit), closureValue.Capture, visitor.data)
 
 	visitor.Result = NewLinesInvokeResult(injectBody)
 }
