@@ -28,7 +28,7 @@ type UnitLocationPath struct {
 	filepath string
 }
 
-func DoModule(moduleQualified string, scriptblockHome string, output output.OutputDirectory) {
+func DoModule(moduleQualified string, scriptblockHome string, output output.OutputDirectory, astbooko astbook.AstBook, importbooko imports.ImportBook, symbollibrary *symbols.SymbolLibrary, valuelibrary *values.ValueLibrary, addressbooko addressbook.AddressBook) {
 
 	// this could be dangerous if given wrong directory
 	// if _, err := os.Stat(output); !os.IsNotExist(err) {
@@ -49,9 +49,8 @@ func DoModule(moduleQualified string, scriptblockHome string, output output.Outp
 
 	moduleName := filepath.Base(filepath.Dir(modulePath)) // module/version
 	locations := registerLocations(files, moduleName)
-	astbooko := parseAllToAsts(locations, moduleName, modulePath)
-	importbooko := takeImportsFromAsts(locations, moduleName, astbooko)
-	symbollibrary := symbols.NewSymbolLibrary()
+	parseAllToAsts(locations, moduleName, modulePath, astbooko)
+	takeImportsFromAsts(locations, moduleName, astbooko, importbooko)
 	order := makeDependencyOrder(locations, moduleName, importbooko)
 
 	logrus.WithFields(logrus.Fields{
@@ -59,9 +58,6 @@ func DoModule(moduleQualified string, scriptblockHome string, output output.Outp
 	}).Info("dependency order produced")
 
 	RunFrontEnd(order, moduleName, astbooko, importbooko, symbollibrary)
-
-	valuelibrary := values.NewValueLibrary()
-	addressbooko := addressbook.NewAddressBook()
 
 	theTags := make(map[string]tags.LocationList)
 
@@ -93,14 +89,12 @@ func registerLocations(files []os.FileInfo, moduleName string) []string {
 	return locations
 }
 
-func parseAllToAsts(units []string, moduleName string, modulePath string) astbook.AstBook {
-	astbooko := astbook.NewAstBook()
+func parseAllToAsts(units []string, moduleName string, modulePath string, astbooko astbook.AstBook) {
 	for _, unitName := range units {
 		filelocation := filepath.Join(modulePath, fmt.Sprintf("%s.sb", unitName))
-		println(filelocation)
 		pstree := parser.Parse(filelocation)
 		astree := astgen.PSTtoAST(pstree)
-		astbook.InsertAst(&location.UnitLocation{moduleName, unitName}, astree, astbooko)
+		astbook.InsertAst(&location.UnitLocation{Module: moduleName, Unit: unitName}, astree, astbooko)
 
 		logrus.WithFields(logrus.Fields{
 			"module": moduleName,
@@ -108,13 +102,11 @@ func parseAllToAsts(units []string, moduleName string, modulePath string) astboo
 			"path":   filelocation,
 		}).Info("ast produced")
 	}
-	return astbooko
 }
 
-func takeImportsFromAsts(units []string, module string, astbooko astbook.AstBook) imports.ImportBook {
-	importbooko := imports.NewImportBook()
+func takeImportsFromAsts(units []string, module string, astbooko astbook.AstBook, importbooko imports.ImportBook) {
 	for _, unitName := range units {
-		astree := astbook.LookupAst(&location.UnitLocation{module, unitName}, astbooko)
+		astree := astbook.LookupAst(&location.UnitLocation{Module: module, Unit: unitName}, astbooko)
 		importList := imports.TakeImports(astree)
 		imports.InsertImportList(module, unitName, importList, importbooko)
 
@@ -128,7 +120,6 @@ func takeImportsFromAsts(units []string, module string, astbooko astbook.AstBook
 			"imports": importListString,
 		}).Info("imports taken")
 	}
-	return importbooko
 }
 
 func makeDependencyOrder(units []string, module string, importbooko imports.ImportBook) []string {
@@ -137,9 +128,9 @@ func makeDependencyOrder(units []string, module string, importbooko imports.Impo
 		"input": units,
 	})
 
-	toId := make(map[string]int)
-	for unitId, unitName := range units {
-		toId[unitName] = unitId
+	toID := make(map[string]int)
+	for unitID, unitName := range units {
+		toID[unitName] = unitID
 	}
 
 	dependencyGraph := dependency.NewDependencyGraph()
@@ -148,11 +139,11 @@ func makeDependencyOrder(units []string, module string, importbooko imports.Impo
 	}
 
 	// connect nodes
-	for unitId, unitName := range units {
+	for unitID, unitName := range units {
 		importList := imports.LookupImportList(module, unitName, importbooko)
 		for _, importLine := range importList {
 			if importLine.Module == module {
-				dependency.AddDependency(unitId, toId[importLine.Unit], dependencyGraph)
+				dependency.AddDependency(unitID, toID[importLine.Unit], dependencyGraph)
 			}
 		}
 	}
@@ -172,7 +163,7 @@ func makeDependencyOrder(units []string, module string, importbooko imports.Impo
 
 func RunFrontEnd(order []string, module string, astbooko astbook.AstBook, importbooko imports.ImportBook, symbolLibrary *symbols.SymbolLibrary) {
 	for _, unitName := range order {
-		DoUnitFront(&location.UnitLocation{module, unitName}, astbooko, importbooko, symbolLibrary)
+		DoUnitFront(&location.UnitLocation{Module: module, Unit: unitName}, astbooko, importbooko, symbolLibrary)
 
 		logrus.WithFields(logrus.Fields{
 			"module": module,
@@ -183,7 +174,7 @@ func RunFrontEnd(order []string, module string, astbooko astbook.AstBook, import
 
 func RunBackEnd(order []string, module string, astbooko astbook.AstBook, valueLibrary *values.ValueLibrary, addressbooko addressbook.AddressBook, theTags map[string]tags.LocationList, modulePath string, output output.OutputDirectory) {
 	for _, unitName := range order {
-		DoUnitBack(&location.UnitLocation{module, unitName}, astbooko, valueLibrary, addressbooko, theTags, modulePath, output)
+		DoUnitBack(&location.UnitLocation{Module: module, Unit: unitName}, astbooko, valueLibrary, addressbooko, theTags, modulePath, output)
 
 		logrus.WithFields(logrus.Fields{
 			"module": module,

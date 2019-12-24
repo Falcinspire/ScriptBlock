@@ -4,7 +4,13 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/falcinspire/scriptblock/front/astbook"
+
 	"github.com/falcinspire/scriptblock/back/output"
+	"github.com/falcinspire/scriptblock/back/values"
+	"github.com/falcinspire/scriptblock/front/addressbook"
+	"github.com/falcinspire/scriptblock/front/imports"
+	"github.com/falcinspire/scriptblock/front/symbols"
 	"github.com/sirupsen/logrus"
 
 	"github.com/falcinspire/scriptblock/dependency"
@@ -17,12 +23,18 @@ func DoProject(sourceModuleQualified string, output output.OutputDirectory) {
 
 	order := makeModuleDependencyOrder(sourceModuleQualified, scriptblockHome)
 
+	astbooko := astbook.NewAstBook()
+	importbooko := imports.NewImportBook()
+	symbollibrary := symbols.NewSymbolLibrary()
+	valuelibrary := values.NewValueLibrary()
+	addressbooko := addressbook.NewAddressBook()
+
 	logrus.WithFields(logrus.Fields{
 		"order": order,
 	}).Info("module dependency order")
 
 	for _, moduleQualified := range order {
-		DoModule(moduleQualified, scriptblockHome, output)
+		DoModule(moduleQualified, scriptblockHome, output, astbooko, importbooko, symbollibrary, valuelibrary, addressbooko)
 	}
 }
 
@@ -30,27 +42,27 @@ func DoProject(sourceModuleQualified string, output output.OutputDirectory) {
 func makeModuleDependencyOrder(moduleQualified string, scriptblockHome string) []string {
 	graph := dependency.NewDependencyGraph()
 
-	moduleToId := make(map[string]int)
+	moduleToID := make(map[string]int)
 	idToModule := make(map[int]string)
 
-	addModuleDependencies(moduleQualified, scriptblockHome, graph, moduleToId, idToModule)
-	orderId, circular := dependency.MakeDependencyOrder(graph)
+	addModuleDependencies(moduleQualified, scriptblockHome, graph, moduleToID, idToModule)
+	orderID, circular := dependency.MakeDependencyOrder(graph)
 	if circular {
-		panic(fmt.Errorf("circular module dependence"))
+		panic(fmt.Errorf("circular module dependency"))
 	}
 
 	order := make([]string, len(graph.Nodes))
-	for index, i := range orderId {
+	for index, i := range orderID {
 		order[index] = idToModule[i]
 	}
 
 	return order
 }
 
-func addModuleDependencies(moduleQualified string, scriptblockHome string, graph *dependency.DependencyGraph, moduleToId map[string]int, idToModule map[int]string) int {
+func addModuleDependencies(moduleQualified string, scriptblockHome string, graph *dependency.DependencyGraph, moduleToID map[string]int, idToModule map[int]string) int {
 	modulePath := filepath.Join(scriptblockHome, moduleQualified)
 
-	id, exists := moduleToId[moduleQualified]
+	id, exists := moduleToID[moduleQualified]
 	if exists {
 		return id
 	}
@@ -60,7 +72,7 @@ func addModuleDependencies(moduleQualified string, scriptblockHome string, graph
 
 	config := home.ReadModuleFile(filepath.Join(modulePath, "module.yaml"))
 	for _, depends := range config.Dependencies {
-		dependsID := addModuleDependencies(depends.Location, scriptblockHome, graph, moduleToId, idToModule)
+		dependsID := addModuleDependencies(filepath.Join(depends.Location, depends.Version), scriptblockHome, graph, moduleToID, idToModule)
 		dependency.AddDependency(id, dependsID, graph)
 	}
 

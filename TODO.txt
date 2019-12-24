@@ -1,3 +1,5 @@
+Output includes version number... decide what to make of that
+
 Move creating values from syntax tree ("5" = 5, \" -> ") to later stage
 FunctionValue -> FunctionReferenceValue & FunctionValue?
 Right now you can only have 1 version of a library at a time
@@ -6,7 +8,7 @@ Right now you can only have 1 version of a library at a time
 Make versioning mandatory?
 Import modules as .git repositories?
 Import (library) vs Include (local)?
-Run module dependency order with imports
+Run module dependency order with imports ,
 Run unit dependency order with includes
 Include/Import snatching? "You don't need to read the entire book to pull out the chapters"
 Go package: 'document'
