@@ -3,7 +3,7 @@ package desugar
 import (
 	"fmt"
 
-	"github.com/falcinspire/scriptblock/front/ast"
+	"github.com/falcinspire/scriptblock/ast"
 	"github.com/falcinspire/scriptblock/front/location"
 	"github.com/google/uuid"
 )

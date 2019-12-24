@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/falcinspire/scriptblock/ast"
 	"github.com/falcinspire/scriptblock/back/dumper"
 	"github.com/falcinspire/scriptblock/back/nativefuncs"
 	"github.com/falcinspire/scriptblock/back/values"
-	"github.com/falcinspire/scriptblock/front/ast"
 	"github.com/google/uuid"
 )
 

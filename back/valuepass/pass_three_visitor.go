@@ -3,10 +3,10 @@ package valuepass
 import (
 	"fmt"
 
+	"github.com/falcinspire/scriptblock/ast"
 	"github.com/falcinspire/scriptblock/back/dumper"
 	"github.com/falcinspire/scriptblock/back/evaluator"
 	"github.com/falcinspire/scriptblock/back/tags"
-	"github.com/falcinspire/scriptblock/front/ast"
 	"github.com/falcinspire/scriptblock/front/location"
 	"github.com/sirupsen/logrus"
 )

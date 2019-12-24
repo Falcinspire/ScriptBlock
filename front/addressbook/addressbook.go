@@ -1,7 +1,7 @@
 package addressbook
 
 import (
-	"github.com/falcinspire/scriptblock/front/ast"
+	"github.com/falcinspire/scriptblock/ast"
 )
 
 // AddressBook stores the actual function code for each unit.

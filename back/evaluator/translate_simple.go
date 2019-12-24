@@ -3,8 +3,8 @@ package evaluator
 import (
 	"fmt"
 
+	"github.com/falcinspire/scriptblock/ast"
 	"github.com/falcinspire/scriptblock/back/values"
-	"github.com/falcinspire/scriptblock/front/ast"
 	"github.com/falcinspire/scriptblock/front/location"
 	"github.com/falcinspire/scriptblock/front/symbols"
 )

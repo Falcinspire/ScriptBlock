@@ -1,6 +1,6 @@
 package desugar
 
-import "github.com/falcinspire/scriptblock/front/ast"
+import "github.com/falcinspire/scriptblock/ast"
 
 type StatementRewriter struct {
 	Body  []ast.Statement

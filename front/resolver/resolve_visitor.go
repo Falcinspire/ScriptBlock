@@ -1,7 +1,7 @@
 package resolver
 
 import (
-	"github.com/falcinspire/scriptblock/front/ast"
+	"github.com/falcinspire/scriptblock/ast"
 	"github.com/falcinspire/scriptblock/front/symbols"
 	"github.com/sirupsen/logrus"
 )

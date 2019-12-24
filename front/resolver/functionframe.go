@@ -1,6 +1,6 @@
 package resolver
 
-import "github.com/falcinspire/scriptblock/front/ast"
+import "github.com/falcinspire/scriptblock/ast"
 
 type FunctionFrame struct {
 	Parameters []string

@@ -1,11 +1,11 @@
 package valuepass
 
 import (
+	"github.com/falcinspire/scriptblock/ast"
 	"github.com/falcinspire/scriptblock/back/evaluator"
 	"github.com/falcinspire/scriptblock/back/tags"
 	"github.com/falcinspire/scriptblock/back/values"
 	"github.com/falcinspire/scriptblock/front/addressbook"
-	"github.com/falcinspire/scriptblock/front/ast"
 	"github.com/falcinspire/scriptblock/front/location"
 )
 

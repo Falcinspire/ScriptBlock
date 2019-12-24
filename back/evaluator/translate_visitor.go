@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/falcinspire/scriptblock/ast"
 	"github.com/falcinspire/scriptblock/back/values"
-
-	"github.com/falcinspire/scriptblock/front/ast"
 )
 
 type TranslateStatementVisitor struct {

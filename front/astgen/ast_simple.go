@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
-	"github.com/falcinspire/scriptblock/front/ast"
+	"github.com/falcinspire/scriptblock/ast"
 	"github.com/falcinspire/scriptblock/front/parser"
 )
 
