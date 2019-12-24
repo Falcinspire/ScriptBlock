@@ -9,7 +9,6 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/falcinspire/scriptblock/back/output"
 	"github.com/falcinspire/scriptblock/back/tags"
 	"github.com/falcinspire/scriptblock/front/astgen"
 	"github.com/falcinspire/scriptblock/front/parser"
@@ -28,7 +27,7 @@ type UnitLocationPath struct {
 	filepath string
 }
 
-func DoModule(moduleQualified string, scriptblockHome string, output output.OutputDirectory, astbooko astbook.AstBook, importbooko imports.ImportBook, symbollibrary *symbols.SymbolLibrary, valuelibrary *values.ValueLibrary, addressbooko addressbook.AddressBook) {
+func DoModule(moduleQualified string, scriptblockHome string, output string, astbooko astbook.AstBook, importbooko imports.ImportBook, symbollibrary *symbols.SymbolLibrary, valuelibrary *values.ValueLibrary, addressbooko addressbook.AddressBook) {
 
 	// this could be dangerous if given wrong directory
 	// if _, err := os.Stat(output); !os.IsNotExist(err) {
@@ -172,7 +171,7 @@ func RunFrontEnd(order []string, module string, astbooko astbook.AstBook, import
 	}
 }
 
-func RunBackEnd(order []string, module string, astbooko astbook.AstBook, valueLibrary *values.ValueLibrary, addressbooko addressbook.AddressBook, theTags map[string]tags.LocationList, modulePath string, output output.OutputDirectory) {
+func RunBackEnd(order []string, module string, astbooko astbook.AstBook, valueLibrary *values.ValueLibrary, addressbooko addressbook.AddressBook, theTags map[string]tags.LocationList, modulePath string, output string) {
 	for _, unitName := range order {
 		DoUnitBack(&location.UnitLocation{Module: module, Unit: unitName}, astbooko, valueLibrary, addressbooko, theTags, modulePath, output)
 

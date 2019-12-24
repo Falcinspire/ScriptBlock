@@ -1,7 +1,6 @@
 package evaluator
 
 import (
-	"github.com/falcinspire/scriptblock/back/output"
 	"github.com/falcinspire/scriptblock/back/values"
 	"github.com/falcinspire/scriptblock/front/addressbook"
 	"github.com/falcinspire/scriptblock/front/location"
@@ -15,5 +14,5 @@ type EvaluateData struct {
 	CallStack    *CallStack
 	LoopInject   *LoopInject
 	ModulePath   string
-	Output       output.OutputDirectory
+	Output       string
 }

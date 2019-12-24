@@ -7,12 +7,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/falcinspire/scriptblock/back/output"
 	"github.com/falcinspire/scriptblock/front/location"
 )
 
 // WriteAllTagsToFiles writes all of the tags and locations provided into the output directory.
-func WriteAllTagsToFiles(tags map[string]LocationList, output output.OutputDirectory) {
+func WriteAllTagsToFiles(tags map[string]LocationList, output string) {
 	for tagInformal, locations := range tags {
 		tag := location.TagLocationFromInformal(tagInformal)
 		WriteTagToFile(tag, locations, output)
@@ -25,7 +24,7 @@ type minecraftTagFormat struct {
 }
 
 // WriteTagToFile writes a single tag and its locations to the output directory.
-func WriteTagToFile(tag *location.TagLocation, locations LocationList, output output.OutputDirectory) {
+func WriteTagToFile(tag *location.TagLocation, locations LocationList, output string) {
 	tagFile := fmt.Sprintf("%s.json", tag.Identity)
 	parentPath := filepath.Join(output, tag.Namespace, "tags/functions/")
 	filePath := filepath.Join(parentPath, tagFile)

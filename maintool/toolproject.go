@@ -6,7 +6,6 @@ import (
 
 	"github.com/falcinspire/scriptblock/front/astbook"
 
-	"github.com/falcinspire/scriptblock/back/output"
 	"github.com/falcinspire/scriptblock/back/values"
 	"github.com/falcinspire/scriptblock/front/addressbook"
 	"github.com/falcinspire/scriptblock/front/imports"
@@ -18,7 +17,7 @@ import (
 	"github.com/falcinspire/scriptblock/home"
 )
 
-func DoProject(sourceModuleQualified string, output output.OutputDirectory) {
+func DoProject(sourceModuleQualified string, output string) {
 	scriptblockHome := environment.GetHomeSourcePath()
 
 	order := makeModuleDependencyOrder(sourceModuleQualified, scriptblockHome)

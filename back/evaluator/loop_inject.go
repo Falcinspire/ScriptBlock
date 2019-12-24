@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/falcinspire/scriptblock/back/dumper"
-	"github.com/falcinspire/scriptblock/back/output"
 	"github.com/falcinspire/scriptblock/front/ast"
 	"github.com/falcinspire/scriptblock/front/location"
 	"github.com/google/uuid"
@@ -18,7 +17,7 @@ func NewLoopInject() *LoopInject {
 	return &LoopInject{[]string{}}
 }
 
-func GenerateTickFunction(inject *LoopInject, unitLocation *location.UnitLocation, output output.OutputDirectory) (module, unit, name string) {
+func GenerateTickFunction(inject *LoopInject, unitLocation *location.UnitLocation, output string) (module, unit, name string) {
 	loopFunctionName := fmt.Sprintf("loop-%s", uuid.New().String())
 	loopFunctionBody := inject.InjectBody
 	dumper.DumpFunction(unitLocation.Module, unitLocation.Unit, loopFunctionName, loopFunctionBody, output)
