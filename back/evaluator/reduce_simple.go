@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/falcinspire/scriptblock/ast"
+	"github.com/falcinspire/scriptblock/ast/symbol"
 	"github.com/falcinspire/scriptblock/back/values"
-	"github.com/falcinspire/scriptblock/front/symbols"
 )
 
 func ReduceIdentifier(identifier *ast.IdentifierExpression, data *EvaluateData) values.Value {
@@ -27,10 +27,10 @@ func ReduceArgumentList(arguments []ast.Expression, data *EvaluateData) []values
 	return argumentValues
 }
 
-func GetValueForAddress(address *symbols.AddressBox, data *EvaluateData) values.Value {
+func GetValueForAddress(address *symbol.AddressBox, data *EvaluateData) values.Value {
 	switch address.Type {
-	case symbols.UNIT:
-		unitAddress := address.Data.(*symbols.UnitAddress)
+	case symbol.UNIT:
+		unitAddress := address.Data.(*symbol.UnitAddress)
 		if unitAddress.Module == data.Location.Module && unitAddress.Unit == data.Location.Unit {
 			// this unit
 			selfExported := values.LookupValueTable(unitAddress.Module, unitAddress.Unit, data.ValueLibrary.Exported)
@@ -54,15 +54,15 @@ func GetValueForAddress(address *symbols.AddressBox, data *EvaluateData) values.
 			}
 			return result
 		}
-	case symbols.PARAMETER:
-		paramAddress := address.Data.(*symbols.ParameterAddress)
+	case symbol.PARAMETER:
+		paramAddress := address.Data.(*symbol.ParameterAddress)
 		result, exists := values.LookupParameterValue(paramAddress.Name, data.LocalValues)
 		if !exists {
 			panic(fmt.Errorf("Could not get value for address %s", paramAddress))
 		}
 		return result
-	case symbols.CAPTURE:
-		captureAddress := address.Data.(*symbols.CaptureAddress)
+	case symbol.CAPTURE:
+		captureAddress := address.Data.(*symbol.CaptureAddress)
 		result, exists := values.LookupCaptureValue(captureAddress.Name, data.LocalValues)
 		if !exists {
 			panic(fmt.Errorf("Could not get value for address %s", captureAddress))

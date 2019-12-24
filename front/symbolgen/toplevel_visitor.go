@@ -2,6 +2,7 @@ package symbolgen
 
 import (
 	"github.com/falcinspire/scriptblock/ast"
+	"github.com/falcinspire/scriptblock/ast/symbol"
 	"github.com/falcinspire/scriptblock/front/location"
 	"github.com/falcinspire/scriptblock/front/symbols"
 )
@@ -19,7 +20,7 @@ func NewTopDefinitionVisitor(address *location.UnitLocation, exported, internal 
 	return &TopDefinitionVisitor{nil, address, exported, internal}
 }
 func (visitor *TopDefinitionVisitor) VisitConstantDefinition(definition *ast.ConstantDefinition) {
-	address := symbols.NewUnitAddressBox(visitor.unitAddress.Module, visitor.unitAddress.Unit, definition.Name)
+	address := symbol.NewUnitAddressBox(visitor.unitAddress.Module, visitor.unitAddress.Unit, definition.Name)
 	var symboltable symbols.SymbolTable
 	if definition.Internal {
 		symboltable = visitor.InternalSymbols
@@ -29,7 +30,7 @@ func (visitor *TopDefinitionVisitor) VisitConstantDefinition(definition *ast.Con
 	symboltable[definition.Name] = address
 }
 func (visitor *TopDefinitionVisitor) VisitFunctionDefinition(definition *ast.FunctionDefinition) {
-	address := symbols.NewUnitAddressBox(visitor.unitAddress.Module, visitor.unitAddress.Unit, definition.Name)
+	address := symbol.NewUnitAddressBox(visitor.unitAddress.Module, visitor.unitAddress.Unit, definition.Name)
 	var symboltable symbols.SymbolTable
 	if definition.Internal {
 		symboltable = visitor.InternalSymbols
@@ -39,7 +40,7 @@ func (visitor *TopDefinitionVisitor) VisitFunctionDefinition(definition *ast.Fun
 	symboltable[definition.Name] = address
 }
 func (visitor *TopDefinitionVisitor) VisitTemplateDefinition(definition *ast.TemplateDefinition) {
-	address := symbols.NewUnitAddressBox(visitor.unitAddress.Module, visitor.unitAddress.Unit, definition.Name)
+	address := symbol.NewUnitAddressBox(visitor.unitAddress.Module, visitor.unitAddress.Unit, definition.Name)
 	var symboltable symbols.SymbolTable
 	if definition.Internal {
 		symboltable = visitor.InternalSymbols
@@ -50,7 +51,7 @@ func (visitor *TopDefinitionVisitor) VisitTemplateDefinition(definition *ast.Tem
 }
 
 func (visitor *TopDefinitionVisitor) VisitFunctionShortcutDefinition(shortcut *ast.FunctionShortcutDefinition) {
-	address := symbols.NewUnitAddressBox(visitor.unitAddress.Module, visitor.unitAddress.Unit, shortcut.Name)
+	address := symbol.NewUnitAddressBox(visitor.unitAddress.Module, visitor.unitAddress.Unit, shortcut.Name)
 	var symboltable symbols.SymbolTable
 	if shortcut.Internal {
 		symboltable = visitor.InternalSymbols

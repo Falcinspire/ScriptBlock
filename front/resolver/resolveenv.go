@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/falcinspire/scriptblock/ast"
+	"github.com/falcinspire/scriptblock/ast/symbol"
 	"github.com/falcinspire/scriptblock/front/imports"
 	"github.com/falcinspire/scriptblock/front/location"
 	"github.com/falcinspire/scriptblock/front/symbols"
@@ -45,12 +46,12 @@ func NewResolveEnvironment(selfInternal, selfExported symbols.SymbolTable, impor
 	return &ResolveEnvironment{symbols.NewLinkedSymbolTable(), selfInternal, selfExported, imported}
 }
 
-func FindLocal(name string, env *ResolveEnvironment) (found *symbols.AddressBox, exists bool) {
+func FindLocal(name string, env *ResolveEnvironment) (found *symbol.AddressBox, exists bool) {
 	found, exists = env.linkedLocals.PeekTable()[name]
 	return
 }
 
-func FindClosed(name string, env *ResolveEnvironment) (found *symbols.AddressBox, exists bool) {
+func FindClosed(name string, env *ResolveEnvironment) (found *symbol.AddressBox, exists bool) {
 	for i := env.linkedLocals.Length() - 2; i >= 0; i-- {
 		closedFound, closedExists := env.linkedLocals.GetTableAt(i)[name]
 		if closedExists {
@@ -62,7 +63,7 @@ func FindClosed(name string, env *ResolveEnvironment) (found *symbols.AddressBox
 	return nil, false
 }
 
-func FindUnit(name string, env *ResolveEnvironment) (found *symbols.AddressBox, exists bool) {
+func FindUnit(name string, env *ResolveEnvironment) (found *symbol.AddressBox, exists bool) {
 	exported, exists := env.selfExported[name]
 	if exists {
 		return exported, true
@@ -76,7 +77,7 @@ func FindUnit(name string, env *ResolveEnvironment) (found *symbols.AddressBox, 
 	return nil, false
 }
 
-func FindImported(name string, env *ResolveEnvironment) (found *symbols.AddressBox, exists bool) {
+func FindImported(name string, env *ResolveEnvironment) (found *symbol.AddressBox, exists bool) {
 	for _, importedTable := range env.imported {
 		imported, exists := importedTable[name]
 		if exists {

@@ -4,8 +4,8 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/falcinspire/scriptblock/ast"
+	"github.com/falcinspire/scriptblock/ast/symbol"
 	"github.com/falcinspire/scriptblock/front/location"
-	"github.com/falcinspire/scriptblock/front/symbols"
 )
 
 type functionFrame struct {
@@ -52,7 +52,7 @@ func desugarTrailing(frame *functionFrame, injector *functionInjector, depth int
 	unitName := toFunction.Unit
 	functionName := toFunction.Name
 	callIdentifier := ast.NewIdentifierExpression(functionName, nil)
-	callIdentifier.Address = symbols.NewUnitAddressBox(moduleName, unitName, functionName)
+	callIdentifier.Address = symbol.NewUnitAddressBox(moduleName, unitName, functionName)
 	var expression ast.Expression
 	if len(captures) > 0 {
 		expression = ast.NewClosureExpression(callIdentifier, captures, nil)
@@ -129,7 +129,7 @@ func makeCaptureSet(child *freeVariableSet, depth int) []*ast.IdentifierExpressi
 	captures := make([]*ast.IdentifierExpression, len(ListFreeSet(child)))
 	for i, enclosedVariable := range ListFreeSet(child) {
 		captures[i] = ast.NewIdentifierExpression(enclosedVariable.Name, nil)
-		captures[i].Address = symbols.NewAddressBox(symbols.PARAMETER, enclosedVariable)
+		captures[i].Address = symbol.NewAddressBox(symbol.PARAMETER, enclosedVariable)
 		if enclosedVariable.ClosureDepth != depth {
 			captures[i].Free = true
 		} else {
@@ -139,6 +139,6 @@ func makeCaptureSet(child *freeVariableSet, depth int) []*ast.IdentifierExpressi
 	return captures
 }
 
-func isFree(enclosedVariable *symbols.ParameterAddress, depth int) bool {
+func isFree(enclosedVariable *symbol.ParameterAddress, depth int) bool {
 	return enclosedVariable.ClosureDepth != depth
 }

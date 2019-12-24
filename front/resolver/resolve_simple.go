@@ -2,6 +2,7 @@ package resolver
 
 import (
 	"github.com/falcinspire/scriptblock/ast"
+	"github.com/falcinspire/scriptblock/ast/symbol"
 	"github.com/falcinspire/scriptblock/front/imports"
 	"github.com/falcinspire/scriptblock/front/location"
 	"github.com/falcinspire/scriptblock/front/symbols"
@@ -15,7 +16,7 @@ func ResolvePass(unit *ast.Unit, unitLocation *location.UnitLocation, symbollibr
 func MakeLocalTableFromParameters(parameters []string, depth int) symbols.LocalSymbolTable {
 	localTable := symbols.NewLocalSymbolTable()
 	for _, parameter := range parameters {
-		localTable[parameter] = symbols.NewParameterAddressBox(depth, parameter)
+		localTable[parameter] = symbol.NewParameterAddressBox(depth, parameter)
 	}
 	return localTable
 }
@@ -40,7 +41,7 @@ func ResolveExpressionFrame(expression ast.Expression, environment *ResolveEnvir
 	environment.linkedLocals.PopTable()
 }
 
-func ResolveIdentifier(name string, metadata *ast.Metadata, environment *ResolveEnvironment) (address *symbols.AddressBox, free bool) {
+func ResolveIdentifier(name string, metadata *ast.Metadata, environment *ResolveEnvironment) (address *symbol.AddressBox, free bool) {
 	tryLocal, exists := FindLocal(name, environment)
 	if exists {
 		return tryLocal, false

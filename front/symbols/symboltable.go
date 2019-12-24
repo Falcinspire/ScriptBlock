@@ -1,12 +1,14 @@
 package symbols
 
-type SymbolTable map[string]*AddressBox
+import "github.com/falcinspire/scriptblock/ast/symbol"
+
+type SymbolTable map[string]*symbol.AddressBox
 
 func NewSymbolTable() SymbolTable {
 	return make(SymbolTable)
 }
 
-type LocalSymbolTable map[string]*AddressBox
+type LocalSymbolTable map[string]*symbol.AddressBox
 
 func NewLocalSymbolTable() LocalSymbolTable {
 	return make(LocalSymbolTable)

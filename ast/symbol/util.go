@@ -1,4 +1,4 @@
-package symbols
+package symbol
 
 func NoParameters() []string {
 	return []string{}

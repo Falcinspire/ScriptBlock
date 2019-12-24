@@ -1,8 +1,6 @@
 package ast
 
-import (
-	"github.com/falcinspire/scriptblock/front/symbols"
-)
+import "github.com/falcinspire/scriptblock/ast/symbol"
 
 // Expression is any node that represents an expression
 type Expression interface {
@@ -165,8 +163,8 @@ func (expression *FormatterExpression) Accept(visitor ExpressionVisitor) {
 // IdentifierExpression is any node that represents a identifier expression
 type IdentifierExpression struct {
 	Name     string
-	Address  *symbols.AddressBox // resolution pass
-	Free     bool                // resolution pass
+	Address  *symbol.AddressBox // resolution pass
+	Free     bool               // resolution pass
 	Metadata *Metadata
 }
 

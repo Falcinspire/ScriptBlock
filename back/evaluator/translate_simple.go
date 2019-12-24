@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/falcinspire/scriptblock/ast"
+	"github.com/falcinspire/scriptblock/ast/symbol"
 	"github.com/falcinspire/scriptblock/back/values"
 	"github.com/falcinspire/scriptblock/front/location"
-	"github.com/falcinspire/scriptblock/front/symbols"
 )
 
 func TranslateFrame(frame *CallFrame, data *EvaluateData) []string {
@@ -47,7 +47,7 @@ func TranslateFrame(frame *CallFrame, data *EvaluateData) []string {
 }
 
 func TranslateTemplate(definition *ast.TemplateDefinition, arguments []values.Value, location *location.UnitLocation, data *EvaluateData) []string {
-	frame := &CallFrame{location, definition.Name, definition.Body, definition.Parameters, symbols.NoCloses(), arguments, values.NoCaptures()}
+	frame := &CallFrame{location, definition.Name, definition.Body, definition.Parameters, symbol.NoCloses(), arguments, values.NoCaptures()}
 	return TranslateFrame(frame, data)
 }
 
@@ -57,6 +57,6 @@ func TranslateClosure(definition *ast.ClosureDefinition, arguments []values.Valu
 }
 
 func TranslateFunction(definition *ast.FunctionDefinition, location *location.UnitLocation, data *EvaluateData) []string {
-	frame := &CallFrame{location, definition.Name, definition.Body, symbols.NoParameters(), symbols.NoCloses(), values.NoArguments(), values.NoCaptures()}
+	frame := &CallFrame{location, definition.Name, definition.Body, symbol.NoParameters(), symbol.NoCloses(), values.NoArguments(), values.NoCaptures()}
 	return TranslateFrame(frame, data)
 }

@@ -2,8 +2,8 @@ package desugar
 
 import (
 	"github.com/falcinspire/scriptblock/ast"
+	"github.com/falcinspire/scriptblock/ast/symbol"
 	"github.com/falcinspire/scriptblock/front/location"
-	"github.com/falcinspire/scriptblock/front/symbols"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,8 +20,8 @@ func newDesugarExpressionVisitor(depth int, freeVariables *freeVariableSet) *des
 
 func (visitor *desugarExpressionVisitor) VisitIdentifier(identifier *ast.IdentifierExpression) {
 	if identifier.Free {
-		AddToFreeSet(identifier.Address.Data.(*symbols.ParameterAddress), visitor.freeVariables)
-		identifier.Address = symbols.NewCaptureAddressBox(identifier.Address.Data.(*symbols.ParameterAddress).Name)
+		AddToFreeSet(identifier.Address.Data.(*symbol.ParameterAddress), visitor.freeVariables)
+		identifier.Address = symbol.NewCaptureAddressBox(identifier.Address.Data.(*symbol.ParameterAddress).Name)
 		identifier.Free = false
 	}
 }

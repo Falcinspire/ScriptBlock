@@ -1,19 +1,19 @@
 package desugar
 
 import (
-	"github.com/falcinspire/scriptblock/front/symbols"
+	"github.com/falcinspire/scriptblock/ast/symbol"
 )
 
 type freeVariableSet struct {
-	list []*symbols.ParameterAddress
+	list []*symbol.ParameterAddress
 	set  map[string]bool
 }
 
 func newFreeVariableSet() *freeVariableSet {
-	return &freeVariableSet{[]*symbols.ParameterAddress{}, map[string]bool{}}
+	return &freeVariableSet{[]*symbol.ParameterAddress{}, map[string]bool{}}
 }
 
-func AddToFreeSet(address *symbols.ParameterAddress, set *freeVariableSet) {
+func AddToFreeSet(address *symbol.ParameterAddress, set *freeVariableSet) {
 	_, exists := set.set[address.Name]
 	if !exists {
 		set.set[address.Name] = true
@@ -21,6 +21,6 @@ func AddToFreeSet(address *symbols.ParameterAddress, set *freeVariableSet) {
 	}
 }
 
-func ListFreeSet(set *freeVariableSet) []*symbols.ParameterAddress {
+func ListFreeSet(set *freeVariableSet) []*symbol.ParameterAddress {
 	return set.list
 }
