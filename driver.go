@@ -10,7 +10,7 @@ import (
 	"github.com/falcinspire/scriptblock/downloader"
 	"github.com/falcinspire/scriptblock/environment"
 	"github.com/falcinspire/scriptblock/home"
-	"github.com/falcinspire/scriptblock/maintool"
+	"github.com/falcinspire/scriptblock/compiler/maintool"
 	"github.com/sirupsen/logrus"
 )
 
