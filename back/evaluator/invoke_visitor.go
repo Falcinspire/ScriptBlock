@@ -6,7 +6,7 @@ import (
 	"github.com/falcinspire/scriptblock/front/location"
 	"github.com/sirupsen/logrus"
 
-	"github.com/falcinspire/scriptblock/front/addressbook"
+	"github.com/falcinspire/scriptblock/back/addressbook"
 
 	"github.com/falcinspire/scriptblock/back/values"
 )

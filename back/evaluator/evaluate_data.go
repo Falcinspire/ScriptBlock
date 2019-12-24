@@ -1,8 +1,8 @@
 package evaluator
 
 import (
+	"github.com/falcinspire/scriptblock/back/addressbook"
 	"github.com/falcinspire/scriptblock/back/values"
-	"github.com/falcinspire/scriptblock/front/addressbook"
 	"github.com/falcinspire/scriptblock/front/location"
 )
 

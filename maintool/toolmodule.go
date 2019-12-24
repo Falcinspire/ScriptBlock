@@ -13,9 +13,9 @@ import (
 	"github.com/falcinspire/scriptblock/front/astgen"
 	"github.com/falcinspire/scriptblock/front/parser"
 
+	"github.com/falcinspire/scriptblock/back/addressbook"
 	"github.com/falcinspire/scriptblock/back/values"
 	"github.com/falcinspire/scriptblock/dependency"
-	"github.com/falcinspire/scriptblock/front/addressbook"
 	"github.com/falcinspire/scriptblock/front/astbook"
 	"github.com/falcinspire/scriptblock/front/imports"
 	"github.com/falcinspire/scriptblock/front/location"
