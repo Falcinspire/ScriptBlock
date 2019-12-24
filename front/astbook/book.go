@@ -2,7 +2,7 @@ package astbook
 
 import (
 	"github.com/falcinspire/scriptblock/ast"
-	"github.com/falcinspire/scriptblock/front/location"
+	"github.com/falcinspire/scriptblock/ast/location"
 )
 
 type AstBook map[string]AstUnitBook

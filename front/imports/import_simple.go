@@ -2,7 +2,7 @@ package imports
 
 import (
 	"github.com/falcinspire/scriptblock/ast"
-	"github.com/falcinspire/scriptblock/front/location"
+	"github.com/falcinspire/scriptblock/ast/location"
 )
 
 func TakeImports(astree *ast.Unit) []*location.UnitLocation {

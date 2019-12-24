@@ -3,7 +3,7 @@ package evaluator
 import (
 	"github.com/falcinspire/scriptblock/back/addressbook"
 	"github.com/falcinspire/scriptblock/back/values"
-	"github.com/falcinspire/scriptblock/front/location"
+	"github.com/falcinspire/scriptblock/ast/location"
 )
 
 type EvaluateData struct {

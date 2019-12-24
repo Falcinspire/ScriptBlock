@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/falcinspire/scriptblock/ast"
-	"github.com/falcinspire/scriptblock/front/location"
+	"github.com/falcinspire/scriptblock/ast/location"
 	"github.com/google/uuid"
 )
 

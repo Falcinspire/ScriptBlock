@@ -18,7 +18,7 @@ import (
 	"github.com/falcinspire/scriptblock/dependency"
 	"github.com/falcinspire/scriptblock/front/astbook"
 	"github.com/falcinspire/scriptblock/front/imports"
-	"github.com/falcinspire/scriptblock/front/location"
+	"github.com/falcinspire/scriptblock/ast/location"
 	"github.com/falcinspire/scriptblock/front/symbols"
 )
 

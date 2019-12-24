@@ -4,8 +4,8 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/falcinspire/scriptblock/ast"
+	"github.com/falcinspire/scriptblock/ast/location"
 	"github.com/falcinspire/scriptblock/ast/symbol"
-	"github.com/falcinspire/scriptblock/front/location"
 )
 
 type functionFrame struct {

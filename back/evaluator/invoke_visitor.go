@@ -3,7 +3,7 @@ package evaluator
 import (
 	"errors"
 
-	"github.com/falcinspire/scriptblock/front/location"
+	"github.com/falcinspire/scriptblock/ast/location"
 	"github.com/sirupsen/logrus"
 
 	"github.com/falcinspire/scriptblock/back/addressbook"

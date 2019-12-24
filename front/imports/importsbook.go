@@ -1,6 +1,6 @@
 package imports
 
-import "github.com/falcinspire/scriptblock/front/location"
+import "github.com/falcinspire/scriptblock/ast/location"
 
 type ImportBook map[string]ImportUnitBook
 

@@ -6,7 +6,7 @@ import (
 	"github.com/falcinspire/scriptblock/back/evaluator"
 	"github.com/falcinspire/scriptblock/back/tags"
 	"github.com/falcinspire/scriptblock/back/values"
-	"github.com/falcinspire/scriptblock/front/location"
+	"github.com/falcinspire/scriptblock/ast/location"
 )
 
 // ValuePass performs all the necessary passes to evaluate and create .mcfunctions for the tree

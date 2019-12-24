@@ -8,7 +8,7 @@ import (
 	"github.com/falcinspire/scriptblock/back/values"
 	"github.com/falcinspire/scriptblock/front/astbook"
 	"github.com/falcinspire/scriptblock/front/imports"
-	"github.com/falcinspire/scriptblock/front/location"
+	"github.com/falcinspire/scriptblock/ast/location"
 	"github.com/falcinspire/scriptblock/front/resolver"
 	"github.com/falcinspire/scriptblock/front/symbolgen"
 	"github.com/falcinspire/scriptblock/front/symbols"
