@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/falcinspire/scriptblock/compiler/ast"
+	"github.com/falcinspire/scriptblock/compiler/ast/location"
 	"github.com/falcinspire/scriptblock/compiler/ast/symbol"
 	"github.com/falcinspire/scriptblock/compiler/back/values"
-	"github.com/falcinspire/scriptblock/compiler/ast/location"
 )
 
 func TranslateFrame(frame *CallFrame, data *EvaluateData) []string {
@@ -46,12 +46,7 @@ func TranslateFrame(frame *CallFrame, data *EvaluateData) []string {
 	return stringBody
 }
 
-func TranslateTemplate(definition *ast.TemplateDefinition, arguments []values.Value, location *location.UnitLocation, data *EvaluateData) []string {
-	frame := &CallFrame{location, definition.Name, definition.Body, definition.Parameters, symbol.NoCloses(), arguments, values.NoCaptures()}
-	return TranslateFrame(frame, data)
-}
-
-func TranslateClosure(definition *ast.ClosureDefinition, arguments []values.Value, location *location.UnitLocation, captures []values.Value, data *EvaluateData) []string {
+func TranslateFunctor(definition *ast.TemplateDefinition, arguments []values.Value, location *location.UnitLocation, captures []values.Value, data *EvaluateData) []string {
 	frame := &CallFrame{location, definition.Name, definition.Body, definition.Parameters, definition.Capture, arguments, captures}
 	return TranslateFrame(frame, data)
 }

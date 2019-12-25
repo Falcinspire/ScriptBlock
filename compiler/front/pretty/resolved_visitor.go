@@ -26,9 +26,9 @@ func (visitor *ResolvedTopDefinitionVisitor) VisitTemplateDefinition(definition 
 	visitor.Result = &ResolvedTemplateDefinition{"template", definition.Name, definition.Internal, definition.Documentation, definition.Parameters, body}
 }
 
-func (visitor *ResolvedTopDefinitionVisitor) VisitClosureDefinition(definition *ast.ClosureDefinition) {
+func (visitor *ResolvedTopDefinitionVisitor) VisitTemplateDefinition(definition *ast.TemplateDefinition) {
 	body := QuickVisitBody(definition.Body)
-	visitor.Result = &ResolvedClosureDefinition{"closure", definition.Name, definition.Internal, definition.Parameters, definition.Capture, body}
+	visitor.Result = &ResolvedTemplateDefinition{"closure", definition.Name, definition.Internal, definition.Parameters, definition.Capture, body}
 }
 
 func QuickVisitExpressionList(expressionsAst []ast.Expression, visitor *ResolvedExpressionVisitor) []ResolvedExpression {
@@ -95,7 +95,7 @@ func QuickVisitAddress(address *symbols.AddressBox) ResolvedAddress {
 		return &ResolvedUnitAddress{data.Module, data.Unit, data.Name}
 	case symbols.PARAMETER:
 		data := address.Data.(*symbols.ParameterAddress)
-		return &ResolvedParameterAddress{data.ClosureDepth, data.Name}
+		return &ResolvedParameterAddress{data.FunctorDepth, data.Name}
 	case symbols.CAPTURE:
 		data := address.Data.(*symbols.CaptureAddress)
 		return &ResolvedCaptureAddress{data.Name}

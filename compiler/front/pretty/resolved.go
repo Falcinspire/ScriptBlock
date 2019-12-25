@@ -37,7 +37,7 @@ type ResolvedTemplateDefinition struct {
 	Body          []ResolvedStatement
 }
 
-type ResolvedClosureDefinition struct {
+type ResolvedTemplateDefinition struct {
 	Type       string
 	Name       string
 	Internal   bool
@@ -94,7 +94,7 @@ type ResolvedUnitAddress struct {
 	Module, Unit, Name string
 }
 type ResolvedParameterAddress struct {
-	ClosureDepth  int
+	FunctorDepth  int
 	ParameterName string
 }
 type ResolvedCaptureAddress struct {

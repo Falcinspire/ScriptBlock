@@ -39,27 +39,9 @@ func (visitor *topOneValueVisitor) VisitTemplateDefinition(definition *ast.Templ
 		"module": visitor.data.Location.Module,
 		"unit":   visitor.data.Location.Unit,
 		"name":   definition.Name,
-	}).Info("Evaluating template reference")
-
-	value := values.NewTemplateValue(visitor.data.Location.Module, visitor.data.Location.Unit, definition.Name)
-	var table values.ValueTable
-	if definition.Internal {
-		table = values.LookupValueTable(visitor.data.Location.Module, visitor.data.Location.Unit, visitor.data.ValueLibrary.Internal)
-	} else {
-		table = values.LookupValueTable(visitor.data.Location.Module, visitor.data.Location.Unit, visitor.data.ValueLibrary.Exported)
-	}
-	table[definition.Name] = value
-
-	addressbook.InsertTemplateAddress(definition, visitor.data.Location.Module, visitor.data.Location.Unit, definition.Name, visitor.data.AddressBook)
-}
-func (visitor *topOneValueVisitor) VisitClosureDefinition(definition *ast.ClosureDefinition) {
-	logrus.WithFields(logrus.Fields{
-		"module": visitor.data.Location.Module,
-		"unit":   visitor.data.Location.Unit,
-		"name":   definition.Name,
 	}).Info("Evaluating closure reference")
 
-	value := values.NewClosureReferenceValue(visitor.data.Location.Module, visitor.data.Location.Unit, definition.Name)
+	value := values.NewTemplateValue(visitor.data.Location.Module, visitor.data.Location.Unit, definition.Name)
 	var table values.ValueTable
 	//TODO closures are all internal?
 	if definition.Internal {
@@ -69,7 +51,7 @@ func (visitor *topOneValueVisitor) VisitClosureDefinition(definition *ast.Closur
 	}
 	table[definition.Name] = value
 
-	addressbook.InsertClosureAddress(definition, visitor.data.Location.Module, visitor.data.Location.Unit, definition.Name, visitor.data.AddressBook)
+	addressbook.InsertFunctorAddress(definition, visitor.data.Location.Module, visitor.data.Location.Unit, definition.Name, visitor.data.AddressBook)
 }
 
 type unitOneValueVisitor struct {

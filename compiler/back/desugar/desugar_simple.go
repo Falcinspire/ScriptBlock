@@ -55,7 +55,7 @@ func desugarTrailing(frame *functionFrame, injector *functionInjector, depth int
 	callIdentifier.Address = symbol.NewUnitAddressBox(moduleName, unitName, functionName)
 	var expression ast.Expression
 	if len(captures) > 0 {
-		expression = ast.NewClosureExpression(callIdentifier, captures, nil)
+		expression = ast.NewFunctorExpression(callIdentifier, captures, nil)
 	} else {
 		expression = callIdentifier
 	}
@@ -86,7 +86,7 @@ func desugarBody(frame *functionFrame, injector *functionInjector, depth int, fr
 		closes = []string{}
 		captures = []*ast.IdentifierExpression{}
 
-		module, unit, name = injector.injectTemplate(frame.Parameters, frame.Body)
+		module, unit, name = injector.injectFunctor(frame.Parameters, symbol.NoCloses(), frame.Body)
 
 		logrus.WithFields(logrus.Fields{
 			"name": name,
@@ -98,7 +98,7 @@ func desugarBody(frame *functionFrame, injector *functionInjector, depth int, fr
 		closes = makeClosesSet(childFreeVariables)
 		captures = makeCaptureSet(childFreeVariables, depth)
 
-		module, unit, name = injector.injectClosure(frame.Parameters, closes, frame.Body)
+		module, unit, name = injector.injectFunctor(frame.Parameters, closes, frame.Body)
 
 		logrus.WithFields(logrus.Fields{
 			"name": name,
@@ -130,7 +130,7 @@ func makeCaptureSet(child *freeVariableSet, depth int) []*ast.IdentifierExpressi
 	for i, enclosedVariable := range ListFreeSet(child) {
 		captures[i] = ast.NewIdentifierExpression(enclosedVariable.Name, nil)
 		captures[i].Address = symbol.NewAddressBox(symbol.PARAMETER, enclosedVariable)
-		if enclosedVariable.ClosureDepth != depth {
+		if enclosedVariable.FunctorDepth != depth {
 			captures[i].Free = true
 		} else {
 			captures[i].Free = false
@@ -140,5 +140,5 @@ func makeCaptureSet(child *freeVariableSet, depth int) []*ast.IdentifierExpressi
 }
 
 func isFree(enclosedVariable *symbol.ParameterAddress, depth int) bool {
-	return enclosedVariable.ClosureDepth != depth
+	return enclosedVariable.FunctorDepth != depth
 }

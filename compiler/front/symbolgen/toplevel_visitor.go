@@ -2,8 +2,8 @@ package symbolgen
 
 import (
 	"github.com/falcinspire/scriptblock/compiler/ast"
-	"github.com/falcinspire/scriptblock/compiler/ast/symbol"
 	"github.com/falcinspire/scriptblock/compiler/ast/location"
+	"github.com/falcinspire/scriptblock/compiler/ast/symbol"
 	"github.com/falcinspire/scriptblock/compiler/front/symbols"
 )
 

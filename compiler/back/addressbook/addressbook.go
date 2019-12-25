@@ -31,26 +31,17 @@ func LookupAddressTable(module, unit string, book AddressBook) *AddressTable {
 }
 
 type AddressTable struct {
-	Templates map[string]*ast.TemplateDefinition
-	Closures  map[string]*ast.ClosureDefinition
+	Functors map[string]*ast.TemplateDefinition
 }
 
 func NewAddressTable() *AddressTable {
-	return &AddressTable{make(map[string]*ast.TemplateDefinition), make(map[string]*ast.ClosureDefinition)}
+	return &AddressTable{make(map[string]*ast.TemplateDefinition)}
 }
 
-func AddressTemplate(module string, unit string, name string, book AddressBook) *ast.TemplateDefinition {
-	return LookupAddressTable(module, unit, book).Templates[name]
+func AddressFunctor(module string, unit string, name string, book AddressBook) *ast.TemplateDefinition {
+	return LookupAddressTable(module, unit, book).Functors[name]
 }
 
-func AddressClosure(module string, unit string, name string, book AddressBook) *ast.ClosureDefinition {
-	return LookupAddressTable(module, unit, book).Closures[name]
-}
-
-func InsertTemplateAddress(template *ast.TemplateDefinition, module string, unit string, name string, book AddressBook) {
-	LookupAddressTable(module, unit, book).Templates[name] = template
-}
-
-func InsertClosureAddress(closure *ast.ClosureDefinition, module string, unit string, name string, book AddressBook) {
-	LookupAddressTable(module, unit, book).Closures[name] = closure
+func InsertFunctorAddress(closure *ast.TemplateDefinition, module string, unit string, name string, book AddressBook) {
+	LookupAddressTable(module, unit, book).Functors[name] = closure
 }

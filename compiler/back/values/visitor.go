@@ -5,6 +5,5 @@ type ValueVisitor interface {
 	VisitString(stringValue *StringValue)
 	VisitFunction(functionValue *FunctionValue)
 	VisitTemplate(templateReference *TemplateValue)
-	VisitClosureReference(closureReference *ClosureReferenceValue)
-	VisitClosure(closureValue *ClosureValue)
+	VisitFunctor(functorValue *FunctorValue)
 }

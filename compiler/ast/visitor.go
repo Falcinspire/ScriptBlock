@@ -22,8 +22,8 @@ type ExpressionVisitor interface {
 	VisitFormatter(expr *FormatterExpression)
 	// VisitIdentifier is the double dispatch for identifier expressions
 	VisitIdentifier(expr *IdentifierExpression)
-	// VisitClosure is the double dispatch for closure expressions
-	VisitClosure(expr *ClosureExpression)
+	// VisitFunctor is the double dispatch for closure expressions
+	VisitFunctor(expr *FunctorExpression)
 	// VisitCall is the double dispatch for call expressions
 	VisitCall(expr *CallExpression)
 }
@@ -46,12 +46,10 @@ type TopVisitor interface {
 	VisitConstantDefinition(definition *ConstantDefinition)
 	// VisitFunctionDefinition is the visitor for function definitions
 	VisitFunctionDefinition(definition *FunctionDefinition)
-	// VisitTemplateDefinition is the visitor for template definitions
-	VisitTemplateDefinition(definition *TemplateDefinition)
 	// VisitFunctionShortcutDefinition is the visitor for function shortcut definitions
 	VisitFunctionShortcutDefinition(shortcut *FunctionShortcutDefinition)
-	// VisitClosureDefinition is the visitor for closure definitions
-	VisitClosureDefinition(definition *ClosureDefinition)
+	// VisitTemplateDefinition is the visitor for closure definitions
+	VisitTemplateDefinition(definition *TemplateDefinition)
 }
 
 // UnitVisitor is the visitor for units

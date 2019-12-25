@@ -178,21 +178,21 @@ func (expression *IdentifierExpression) Accept(visitor ExpressionVisitor) {
 	visitor.VisitIdentifier(expression)
 }
 
-// ClosureExpression is any node that represents a closure expression
-type ClosureExpression struct {
+// FunctorExpression is any node that represents a closure expression
+type FunctorExpression struct {
 	Callee   Expression
 	Capture  []*IdentifierExpression
 	Metadata *Metadata
 }
 
-// NewClosureExpression is a constructor for ClosureExpression
-func NewClosureExpression(callee Expression, capture []*IdentifierExpression, metadata *Metadata) *ClosureExpression {
-	return &ClosureExpression{callee, capture, metadata}
+// NewFunctorExpression is a constructor for FunctorExpression
+func NewFunctorExpression(callee Expression, capture []*IdentifierExpression, metadata *Metadata) *FunctorExpression {
+	return &FunctorExpression{callee, capture, metadata}
 }
 
 // Accept runs the double dispatch for the visitor
-func (expression *ClosureExpression) Accept(visitor ExpressionVisitor) {
-	visitor.VisitClosure(expression)
+func (expression *FunctorExpression) Accept(visitor ExpressionVisitor) {
+	visitor.VisitFunctor(expression)
 }
 
 // CallExpression is any node that represents a call expression

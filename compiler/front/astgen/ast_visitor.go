@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/falcinspire/scriptblock/compiler/ast/symbol"
+
 	"github.com/falcinspire/scriptblock/compiler/ast"
 	"github.com/falcinspire/scriptblock/compiler/front/parser"
 )
@@ -217,7 +219,7 @@ func (visitor *topConvertVisitor) EnterTemplateDefinitionTop(ctxSwitch *parser.T
 	if ctx.Documentation() != nil {
 		docs = convertDoc(ctx.Documentation())
 	}
-	visitor.Definition = ast.NewTemplateDefinition(name, frame.Parameters, frame.Body, internal, docs, convertMetadata(ctx))
+	visitor.Definition = ast.NewTemplateDefinition(name, frame.Parameters, symbol.NoCloses(), frame.Body, internal, docs, convertMetadata(ctx))
 }
 
 // EnterFunctionShortcutTop is the visitor enter method for shortcut definitions.

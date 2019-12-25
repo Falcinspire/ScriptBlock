@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/falcinspire/scriptblock/compiler/ast"
+	"github.com/falcinspire/scriptblock/compiler/ast/location"
 	"github.com/falcinspire/scriptblock/compiler/back/dumper"
 	"github.com/falcinspire/scriptblock/compiler/back/evaluator"
 	"github.com/falcinspire/scriptblock/compiler/back/tags"
-	"github.com/falcinspire/scriptblock/compiler/ast/location"
 	"github.com/sirupsen/logrus"
 )
 

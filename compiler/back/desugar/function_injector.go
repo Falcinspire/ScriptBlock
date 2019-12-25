@@ -23,15 +23,9 @@ func (injector *functionInjector) injectFunction(body []ast.Statement) (module, 
 	injector.unit.Definitions = append(injector.unit.Definitions, ast.NewFunctionDefinition(functionName, body, true, ast.Tag{}, "", nil))
 	return injector.location.Module, injector.location.Unit, functionName
 }
-func (injector *functionInjector) injectTemplate(parameters []string, body []ast.Statement) (module, unit, name string) {
-	templateName := fmt.Sprintf("%s-%s", injector.location.Unit, uuid.New().String())
-	injector.unit.Definitions = append(injector.unit.Definitions, ast.NewTemplateDefinition(templateName, parameters, body, true, "", nil))
-
-	return injector.location.Module, injector.location.Unit, templateName
-}
-func (injector *functionInjector) injectClosure(parameters []string, captures []string, body []ast.Statement) (module, unit, name string) {
+func (injector *functionInjector) injectFunctor(parameters []string, captures []string, body []ast.Statement) (module, unit, name string) {
 	closureName := fmt.Sprintf("%s-%s", injector.location.Unit, uuid.New().String())
-	injector.unit.Definitions = append(injector.unit.Definitions, ast.NewClosureDefinition(closureName, parameters, captures, body, true, nil))
+	injector.unit.Definitions = append(injector.unit.Definitions, ast.NewTemplateDefinition(closureName, parameters, captures, body, true, "", nil))
 
 	return injector.location.Module, injector.location.Unit, closureName
 }

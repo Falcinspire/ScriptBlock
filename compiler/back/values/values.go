@@ -64,26 +64,14 @@ func (this *TemplateValue) Accept(visitor ValueVisitor) {
 	visitor.VisitTemplate(this)
 }
 
-// TODO rename function/template to function/template reference
-type ClosureReferenceValue struct {
-	Module, Unit, Name string
-}
-
-func NewClosureReferenceValue(module, unit, name string) *ClosureReferenceValue {
-	return &ClosureReferenceValue{module, unit, name}
-}
-func (this *ClosureReferenceValue) Accept(visitor ValueVisitor) {
-	visitor.VisitClosureReference(this)
-}
-
-type ClosureValue struct {
-	Callee  *ClosureReferenceValue
+type FunctorValue struct {
+	Callee  *TemplateValue
 	Capture []Value
 }
 
-func NewClosureValue(callee *ClosureReferenceValue, capture []Value) *ClosureValue {
-	return &ClosureValue{callee, capture}
+func NewFunctorValue(callee *TemplateValue, capture []Value) *FunctorValue {
+	return &FunctorValue{callee, capture}
 }
-func (this *ClosureValue) Accept(visitor ValueVisitor) {
-	visitor.VisitClosure(this)
+func (this *FunctorValue) Accept(visitor ValueVisitor) {
+	visitor.VisitFunctor(this)
 }

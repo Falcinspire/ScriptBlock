@@ -31,7 +31,7 @@ func NewUnitAddressBox(module string, unit string, name string) *AddressBox {
 }
 
 type ParameterAddress struct {
-	ClosureDepth int
+	FunctorDepth int
 	Name         string
 }
 
