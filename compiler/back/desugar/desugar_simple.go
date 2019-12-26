@@ -1,8 +1,6 @@
 package desugar
 
 import (
-	"fmt"
-
 	"github.com/sirupsen/logrus"
 
 	"github.com/falcinspire/scriptblock/compiler/ast"
@@ -46,12 +44,7 @@ func desugarTrailing(frame *functionFrame, injector *functionInjector, depth int
 	freeVariables := newFreeVariableSet()
 	toFunction := desugarBody(frame, injector, depth, freeVariables)
 
-	// fmt.Println("A")
 	captures := toFunction.PassCaptures
-	// for _, aCapture := range captures {
-	// 	aCapture.Accept(newDesugarExpressionVisitor(depth, freeVariables))
-	// }
-	// fmt.Println("B")
 
 	moduleName := toFunction.Module
 	unitName := toFunction.Unit
@@ -102,9 +95,6 @@ func desugarBody(frame *functionFrame, injector *functionInjector, depth int, fr
 		passChildFreesUp(freeVariables, childFreeVariables, depth)
 		closes = makeClosesSet(childFreeVariables)
 		captures = makeCaptureSet(childFreeVariables, depth)
-
-		fmt.Println("Closes")
-		fmt.Println(closes)
 
 		module, unit, name = injector.injectFunctor(frame.Parameters, closes, frame.Body)
 

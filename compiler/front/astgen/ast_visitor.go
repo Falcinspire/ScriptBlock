@@ -1,7 +1,6 @@
 package astgen
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -260,7 +259,6 @@ func (visitor *unitConvertVisitor) EnterUnit(ctx *parser.UnitContext) {
 		entireString := importContext.STRING().GetText()
 		stringValue := entireString[1 : len(entireString)-1] // TODO crop quotes method? & check this in front end
 		module, unit := parseImportStatement(stringValue)
-		fmt.Printf("%s %s\n", module, unit) // TODO replace with log or delete
 		importLines[i] = &ast.ImportLine{Module: module, Unit: unit}
 	}
 

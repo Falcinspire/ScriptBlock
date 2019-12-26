@@ -1,7 +1,7 @@
 package evaluator
 
 import (
-	"fmt"
+	"github.com/sirupsen/logrus"
 
 	"github.com/falcinspire/scriptblock/compiler/ast"
 	"github.com/falcinspire/scriptblock/compiler/ast/location"
@@ -12,7 +12,9 @@ import (
 func TranslateFrame(frame *CallFrame, data *EvaluateData) []string {
 
 	PushCallStack(frame.Name, data.CallStack)
-	fmt.Println(ListCallStack(data.CallStack))
+	logrus.WithFields(logrus.Fields{
+		"data": data.CallStack,
+	}).Info("call stack updated")
 
 	mappedArguments := make(map[string]values.Value)
 	for i, parameter := range frame.Parameters {

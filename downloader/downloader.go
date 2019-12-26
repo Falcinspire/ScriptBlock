@@ -1,11 +1,12 @@
 package downloader
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/falcinspire/scriptblock/environment"
 	"github.com/falcinspire/scriptblock/home"
@@ -15,7 +16,9 @@ import (
 // git clone probably fails bc folder is not empty
 func Download(data environment.ModuleDescription) { //TODO maybe make ModuleDescription a pointer
 	home.MakeModulePath(data)
-	fmt.Println("Cloning " + "https://" + data.Location)                        //TODO move output to logrus
+	logrus.WithFields(logrus.Fields{
+		"from": "https://" + data.Location,
+	}).Info("Cloning")
 	cmd := exec.Command("git", "clone", "https://"+data.Location, data.Version) //TODO maybe include this in input? or filter it out?
 	cmd.Dir = environment.GetAbreviatedModulePath(data)
 	err := cmd.Run()
@@ -31,6 +34,8 @@ func Download(data environment.ModuleDescription) { //TODO maybe make ModuleDesc
 		}
 	}
 	gitHome := filepath.Join(environment.GetModulePath(data), ".git")
-	fmt.Println("Deleting " + gitHome)
+	logrus.WithFields(logrus.Fields{
+		"folder": gitHome,
+	}).Info("Deleting git home")
 	os.RemoveAll(gitHome)
 }
