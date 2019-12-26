@@ -11,7 +11,6 @@ import (
 
 func TranslateFrame(frame *CallFrame, data *EvaluateData) []string {
 
-	// TODO move or not?
 	PushCallStack(frame.Name, data.CallStack)
 	fmt.Println(ListCallStack(data.CallStack))
 
