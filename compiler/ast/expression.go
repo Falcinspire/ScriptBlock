@@ -164,13 +164,12 @@ func (expression *FormatterExpression) Accept(visitor ExpressionVisitor) {
 type IdentifierExpression struct {
 	Name     string
 	Address  *symbol.AddressBox // resolution pass
-	Free     bool               // resolution pass
 	Metadata *Metadata
 }
 
 // NewIdentifierExpression is a constructor for IdentifierExpression
 func NewIdentifierExpression(name string, metadata *Metadata) *IdentifierExpression {
-	return &IdentifierExpression{name, nil, false, metadata}
+	return &IdentifierExpression{name, nil, metadata}
 }
 
 // Accept runs the double dispatch for the visitor

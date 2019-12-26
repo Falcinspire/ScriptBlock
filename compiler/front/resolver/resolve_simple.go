@@ -2,9 +2,9 @@ package resolver
 
 import (
 	"github.com/falcinspire/scriptblock/compiler/ast"
+	"github.com/falcinspire/scriptblock/compiler/ast/location"
 	"github.com/falcinspire/scriptblock/compiler/ast/symbol"
 	"github.com/falcinspire/scriptblock/compiler/front/imports"
-	"github.com/falcinspire/scriptblock/compiler/ast/location"
 	"github.com/falcinspire/scriptblock/compiler/front/symbols"
 )
 
@@ -22,11 +22,10 @@ func MakeLocalTableFromParameters(parameters []string, depth int) symbols.LocalS
 }
 
 func ResolveFunctionFrame(frame *FunctionFrame, environment *ResolveEnvironment, depth int) {
-	newDepth := depth + 1
-	environment.linkedLocals.PushTable(MakeLocalTableFromParameters(frame.Parameters, newDepth))
+	environment.linkedLocals.PushTable(MakeLocalTableFromParameters(frame.Parameters, depth))
 
 	for _, statement := range frame.Body {
-		statement.Accept(NewResolveStatementVisitor(environment, newDepth))
+		statement.Accept(NewResolveStatementVisitor(environment, depth))
 	}
 
 	environment.linkedLocals.PopTable()
@@ -41,25 +40,25 @@ func ResolveExpressionFrame(expression ast.Expression, environment *ResolveEnvir
 	environment.linkedLocals.PopTable()
 }
 
-func ResolveIdentifier(name string, metadata *ast.Metadata, environment *ResolveEnvironment) (address *symbol.AddressBox, free bool) {
+func ResolveIdentifier(name string, metadata *ast.Metadata, environment *ResolveEnvironment) (address *symbol.AddressBox) {
 	tryLocal, exists := FindLocal(name, environment)
 	if exists {
-		return tryLocal, false
+		return tryLocal
 	}
 
 	tryClosed, exists := FindClosed(name, environment)
 	if exists {
-		return tryClosed, true
+		return tryClosed
 	}
 
 	tryUnit, exists := FindUnit(name, environment)
 	if exists {
-		return tryUnit, false
+		return tryUnit
 	}
 
 	tryImport, exists := FindImported(name, environment)
 	if exists {
-		return tryImport, false
+		return tryImport
 	}
 
 	panic(NewResolveError(name, metadata))

@@ -18,15 +18,13 @@ func NewResolveExpressionVisitor(environment *ResolveEnvironment) *ResolveExpres
 	return visitor
 }
 func (visitor *ResolveExpressionVisitor) VisitIdentifier(identifier *ast.IdentifierExpression) {
-	address, free := ResolveIdentifier(identifier.Name, identifier.Metadata, visitor.environment)
+	address := ResolveIdentifier(identifier.Name, identifier.Metadata, visitor.environment)
 	identifier.Address = address
-	identifier.Free = free
 
 	logrus.WithFields(logrus.Fields{
 		"identifier":  identifier.Name,
 		"addressType": address.Type,
 		"address":     address.Data,
-		"free":        free,
 	}).Info("resolved identifier")
 }
 func (visitor *ResolveExpressionVisitor) VisitAdd(add *ast.AddExpression) {
@@ -83,7 +81,7 @@ func (visitor *ResolveStatementVisitor) VisitFunctionCall(call *ast.FunctionCall
 	if call.Trailing != nil {
 		frame := &FunctionFrame{call.Trailing.Parameters, call.Trailing.Body}
 		environment := visitor.environment
-		ResolveFunctionFrame(frame, environment, visitor.depth)
+		ResolveFunctionFrame(frame, environment, visitor.depth+1)
 	}
 }
 
@@ -109,7 +107,7 @@ func (visitor *ResolveTopDefinitionVisitor) VisitFunctionDefinition(definition *
 
 	frame := &FunctionFrame{make([]string, 0), definition.Body}
 	environment := visitor.environment
-	depth := -1
+	depth := 0
 	ResolveFunctionFrame(frame, environment, depth)
 }
 
@@ -126,7 +124,7 @@ func (visitor *ResolveTopDefinitionVisitor) VisitTemplateDefinition(definition *
 
 	frame := &FunctionFrame{definition.Parameters, definition.Body}
 	environment := visitor.environment
-	depth := -1
+	depth := 0
 	ResolveFunctionFrame(frame, environment, depth)
 }
 

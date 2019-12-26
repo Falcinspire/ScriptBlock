@@ -1,6 +1,8 @@
 package desugar
 
 import (
+	"fmt"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/falcinspire/scriptblock/compiler/ast"
@@ -24,7 +26,7 @@ func desugarFunctionFrame(frame *functionFrame, injector *functionInjector, dept
 	freeVars := newFreeVariableSet()
 
 	for i, statement := range frame.Body {
-		statement.Accept(newDesugarStatementVisitor(injector, NewStatementRewriter(frame.Body, i), depth+1, freeVars))
+		statement.Accept(newDesugarStatementVisitor(injector, NewStatementRewriter(frame.Body, i), depth, freeVars))
 	}
 
 	return freeVars
@@ -40,13 +42,16 @@ type desugaredBody struct {
 	PassCaptures       []*ast.IdentifierExpression
 }
 
-func desugarTrailing(frame *functionFrame, injector *functionInjector, depth int, freeVariables *freeVariableSet) ast.Expression {
+func desugarTrailing(frame *functionFrame, injector *functionInjector, depth int) ast.Expression {
+	freeVariables := newFreeVariableSet()
 	toFunction := desugarBody(frame, injector, depth, freeVariables)
 
+	// fmt.Println("A")
 	captures := toFunction.PassCaptures
-	for _, aCapture := range captures {
-		aCapture.Accept(newDesugarExpressionVisitor(depth, freeVariables))
-	}
+	// for _, aCapture := range captures {
+	// 	aCapture.Accept(newDesugarExpressionVisitor(depth, freeVariables))
+	// }
+	// fmt.Println("B")
 
 	moduleName := toFunction.Module
 	unitName := toFunction.Unit
@@ -98,6 +103,9 @@ func desugarBody(frame *functionFrame, injector *functionInjector, depth int, fr
 		closes = makeClosesSet(childFreeVariables)
 		captures = makeCaptureSet(childFreeVariables, depth)
 
+		fmt.Println("Closes")
+		fmt.Println(closes)
+
 		module, unit, name = injector.injectFunctor(frame.Parameters, closes, frame.Body)
 
 		logrus.WithFields(logrus.Fields{
@@ -130,11 +138,6 @@ func makeCaptureSet(child *freeVariableSet, depth int) []*ast.IdentifierExpressi
 	for i, enclosedVariable := range ListFreeSet(child) {
 		captures[i] = ast.NewIdentifierExpression(enclosedVariable.Name, nil)
 		captures[i].Address = symbol.NewAddressBox(symbol.PARAMETER, enclosedVariable)
-		if enclosedVariable.ClosureDepth != depth {
-			captures[i].Free = true
-		} else {
-			captures[i].Free = false
-		}
 	}
 	return captures
 }

@@ -19,10 +19,32 @@ func newDesugarExpressionVisitor(depth int, freeVariables *freeVariableSet) *des
 }
 
 func (visitor *desugarExpressionVisitor) VisitIdentifier(identifier *ast.IdentifierExpression) {
-	if identifier.Free {
-		AddToFreeSet(identifier.Address.Data.(*symbol.ParameterAddress), visitor.freeVariables)
-		identifier.Address = symbol.NewCaptureAddressBox(identifier.Address.Data.(*symbol.ParameterAddress).Name)
-		identifier.Free = false
+	//TODO check this
+	if identifier.Address.Type == symbol.PARAMETER {
+		parameterAddress := identifier.Address.Data.(*symbol.ParameterAddress)
+		if parameterAddress.ClosureDepth != visitor.depth {
+
+			logrus.WithFields(logrus.Fields{
+				"name":       parameterAddress.Name,
+				"depth":      parameterAddress.ClosureDepth,
+				"visitDepth": visitor.depth,
+			}).Info("passing up free identifier")
+
+			AddToFreeSet(identifier.Address.Data.(*symbol.ParameterAddress), visitor.freeVariables)
+			identifier.Address = symbol.NewCaptureAddressBox(identifier.Address.Data.(*symbol.ParameterAddress).Name)
+		}
+	}
+	// if identifier.Free {
+	// 	AddToFreeSet(identifier.Address.Data.(*symbol.ParameterAddress), visitor.freeVariables)
+	// 	identifier.Address = symbol.NewCaptureAddressBox(identifier.Address.Data.(*symbol.ParameterAddress).Name)
+	// 	identifier.Free = false
+	// }
+}
+
+func (visitor *desugarExpressionVisitor) VisitFunctor(functor *ast.FunctorExpression) {
+	functor.Callee.Accept(visitor)
+	for _, arg := range functor.Capture {
+		arg.Accept(visitor)
 	}
 }
 
@@ -41,15 +63,15 @@ func newDesugarStatementVisitor(injector *functionInjector, rewriter *StatementR
 }
 
 func (visitor *desugarStatementVisitor) VisitFunctionCall(call *ast.FunctionCall) {
-	for _, argument := range call.Arguments {
-		argument.Accept(newDesugarExpressionVisitor(visitor.depth, visitor.freeVariables))
-	}
-
 	if call.Trailing != nil {
 		trailing := call.Trailing
-		trailingToExpression := desugarTrailing(&functionFrame{trailing.Parameters, trailing.Body}, visitor.injector, visitor.depth, visitor.freeVariables)
+		trailingToExpression := desugarTrailing(&functionFrame{trailing.Parameters, trailing.Body}, visitor.injector, visitor.depth+1)
 		call.Arguments = append(call.Arguments, trailingToExpression)
 		call.Trailing = nil
+	}
+
+	for _, argument := range call.Arguments {
+		argument.Accept(newDesugarExpressionVisitor(visitor.depth, visitor.freeVariables))
 	}
 }
 func (visitor *desugarStatementVisitor) VisitDelay(call *ast.DelayStatement) {
@@ -57,7 +79,8 @@ func (visitor *desugarStatementVisitor) VisitDelay(call *ast.DelayStatement) {
 		"line_local": visitor.rewriter.index,
 	}).Info("rewriting delay call")
 
-	trailingToExpression := desugarTrailing(&functionFrame{[]string{}, call.Body}, visitor.injector, visitor.depth, visitor.freeVariables)
+	//TODO does something need to be updated here?
+	trailingToExpression := desugarTrailing(&functionFrame{[]string{}, call.Body}, visitor.injector, visitor.depth+1)
 	call.FunctionCall = ast.NewFunctionCall(trailingToExpression, []ast.Expression{}, nil, nil)
 }
 
@@ -85,7 +108,7 @@ func (visitor *desugarTopDefinitionVisitor) VisitFunctionDefinition(definition *
 
 	frame := &functionFrame{make([]string, 0), definition.Body}
 	injector := visitor.injector
-	depth := -1
+	depth := 0
 	desugarFunctionFrame(frame, injector, depth)
 }
 
@@ -104,7 +127,7 @@ func (visitor *desugarTopDefinitionVisitor) VisitTemplateDefinition(definition *
 
 	frame := &functionFrame{definition.Parameters, definition.Body}
 	injector := visitor.injector
-	depth := -1
+	depth := 0
 	desugarFunctionFrame(frame, injector, depth)
 }
 
