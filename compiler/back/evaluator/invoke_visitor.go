@@ -36,6 +36,9 @@ func (visitor *InvokeValueVisitor) VisitFunctor(functorValue *values.FunctorValu
 	logrus.WithFields(logrus.Fields{
 		"argslength":    len(visitor.arguments),
 		"capturelength": len(functorValue.Capture),
+		"module":        functorValue.Callee.Module,
+		"unit":          functorValue.Callee.Unit,
+		"name":          functorValue.Callee.Name,
 	}).Info("invoking functor")
 
 	templateReference := functorValue.Callee
