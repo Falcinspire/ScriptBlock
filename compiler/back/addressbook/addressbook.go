@@ -38,7 +38,7 @@ func NewAddressTable() *AddressTable {
 	return &AddressTable{make(map[string]*ast.TemplateDefinition)}
 }
 
-func AddressFunctor(module string, unit string, name string, book AddressBook) *ast.TemplateDefinition {
+func AddressTemplate(module string, unit string, name string, book AddressBook) *ast.TemplateDefinition {
 	return LookupAddressTable(module, unit, book).Functors[name]
 }
 

@@ -39,7 +39,7 @@ func (visitor *InvokeValueVisitor) VisitFunctor(functorValue *values.FunctorValu
 	}).Info("invoking functor")
 
 	templateReference := functorValue.Callee
-	theFunctor := addressbook.AddressFunctor(templateReference.Module, templateReference.Unit, templateReference.Name, visitor.data.AddressBook)
+	theFunctor := addressbook.AddressTemplate(templateReference.Module, templateReference.Unit, templateReference.Name, visitor.data.AddressBook)
 	injectBody := TranslateFunctor(theFunctor, visitor.arguments, location.NewUnitLocation(templateReference.Module, templateReference.Unit), functorValue.Capture, visitor.data)
 
 	visitor.Result = NewLinesInvokeResult(injectBody)
@@ -52,7 +52,7 @@ func (visitor *InvokeValueVisitor) VisitTemplate(templateValue *values.TemplateV
 		"argslength": len(visitor.arguments),
 	}).Info("invoking template")
 
-	theTemplate := addressbook.AddressFunctor(templateValue.Module, templateValue.Unit, templateValue.Name, visitor.data.AddressBook)
+	theTemplate := addressbook.AddressTemplate(templateValue.Module, templateValue.Unit, templateValue.Name, visitor.data.AddressBook)
 	injectBody := TranslateFunctor(theTemplate, visitor.arguments, location.NewUnitLocation(templateValue.Module, templateValue.Unit), []values.Value{}, visitor.data) // TODO make this different location?
 
 	visitor.Result = NewLinesInvokeResult(injectBody)
