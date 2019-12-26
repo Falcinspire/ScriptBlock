@@ -28,3 +28,6 @@ Evaluate dependency order
 Document end --provide documents-- Front end
 Front end --provide aasts-- Back end
 Back end --compile--
+
+Remove explicit call stack in favor of implicit function stack?
+Seperate cmd flags into seperate cmds
