@@ -33,7 +33,7 @@ func (visitor *BaseExpressionVisitor) VisitFormatter(expr *FormatterExpression) 
 // VisitIdentifier is the double dispatch for identifier expressions that does nothing by default
 func (visitor *BaseExpressionVisitor) VisitIdentifier(expr *IdentifierExpression) {}
 
-// VisitFunctor is the double dispatch for closure expressions that does nothing by default
+// VisitFunctor is the double dispatch for functor expressions that does nothing by default
 func (visitor *BaseExpressionVisitor) VisitFunctor(expr *FunctorExpression) {}
 
 // VisitCall is the double dispatch for call expressions that does nothing by default
@@ -67,5 +67,5 @@ func (visitor *BaseTopVisitor) VisitFunctionDefinition(definition *FunctionDefin
 func (visitor *BaseTopVisitor) VisitFunctionShortcutDefinition(definition *FunctionShortcutDefinition) {
 }
 
-// VisitTemplateDefinition is the visitor for closure definitions that does nothing by default
+// VisitTemplateDefinition is the visitor for template definitions that does nothing by default
 func (visitor *BaseTopVisitor) VisitTemplateDefinition(definition *TemplateDefinition) {}

@@ -32,28 +32,28 @@ func (visitor *InvokeValueVisitor) VisitFunction(functionValue *values.FunctionV
 
 	visitor.Result = NewFunctionReferenceInvokeResult(functionValue.Module, functionValue.Unit, functionValue.Name)
 }
-func (visitor *InvokeValueVisitor) VisitFunctor(closureValue *values.FunctorValue) {
+func (visitor *InvokeValueVisitor) VisitFunctor(functorValue *values.FunctorValue) {
 	logrus.WithFields(logrus.Fields{
 		"argslength":    len(visitor.arguments),
-		"capturelength": len(closureValue.Capture),
-	}).Info("invoking closure")
+		"capturelength": len(functorValue.Capture),
+	}).Info("invoking functor")
 
-	closureReference := closureValue.Callee
-	theFunctor := addressbook.AddressFunctor(closureReference.Module, closureReference.Unit, closureReference.Name, visitor.data.AddressBook)
-	injectBody := TranslateFunctor(theFunctor, visitor.arguments, location.NewUnitLocation(closureReference.Module, closureReference.Unit), closureValue.Capture, visitor.data)
+	templateReference := functorValue.Callee
+	theFunctor := addressbook.AddressFunctor(templateReference.Module, templateReference.Unit, templateReference.Name, visitor.data.AddressBook)
+	injectBody := TranslateFunctor(theFunctor, visitor.arguments, location.NewUnitLocation(templateReference.Module, templateReference.Unit), functorValue.Capture, visitor.data)
 
 	visitor.Result = NewLinesInvokeResult(injectBody)
 }
-func (visitor *InvokeValueVisitor) VisitTemplate(closureReference *values.TemplateValue) {
+func (visitor *InvokeValueVisitor) VisitTemplate(templateValue *values.TemplateValue) {
 	logrus.WithFields(logrus.Fields{
-		"module":     closureReference.Module,
-		"unit":       closureReference.Unit,
-		"name":       closureReference.Name,
+		"module":     templateValue.Module,
+		"unit":       templateValue.Unit,
+		"name":       templateValue.Name,
 		"argslength": len(visitor.arguments),
 	}).Info("invoking template")
 
-	theTemplate := addressbook.AddressFunctor(closureReference.Module, closureReference.Unit, closureReference.Name, visitor.data.AddressBook)
-	injectBody := TranslateFunctor(theTemplate, visitor.arguments, location.NewUnitLocation(closureReference.Module, closureReference.Unit), []values.Value{}, visitor.data) // TODO make this different location?
+	theTemplate := addressbook.AddressFunctor(templateValue.Module, templateValue.Unit, templateValue.Name, visitor.data.AddressBook)
+	injectBody := TranslateFunctor(theTemplate, visitor.arguments, location.NewUnitLocation(templateValue.Module, templateValue.Unit), []values.Value{}, visitor.data) // TODO make this different location?
 
 	visitor.Result = NewLinesInvokeResult(injectBody)
 }

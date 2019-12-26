@@ -47,11 +47,11 @@ func (visitor *ReduceExpressionVisitor) VisitString(stringExpression *ast.String
 func (visitor *ReduceExpressionVisitor) VisitIdentifier(identifier *ast.IdentifierExpression) {
 	visitor.Result = GetValueForAddress(identifier.Address, visitor.data)
 }
-func (visitor *ReduceExpressionVisitor) VisitFunctor(closure *ast.FunctorExpression) {
-	callee := visitor.QuickVisitExpression(closure.Callee).(*values.TemplateValue)
+func (visitor *ReduceExpressionVisitor) VisitFunctor(functor *ast.FunctorExpression) {
+	callee := visitor.QuickVisitExpression(functor.Callee).(*values.TemplateValue)
 
-	captureArgs := make([]values.Value, len(closure.Capture))
-	for i, capture := range closure.Capture {
+	captureArgs := make([]values.Value, len(functor.Capture))
+	for i, capture := range functor.Capture {
 		captureArgs[i] = ReduceIdentifier(capture, visitor.data)
 	}
 	visitor.Result = values.NewFunctorValue(callee, captureArgs)

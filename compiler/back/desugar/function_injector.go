@@ -24,10 +24,10 @@ func (injector *functionInjector) injectFunction(body []ast.Statement) (module, 
 	return injector.location.Module, injector.location.Unit, functionName
 }
 func (injector *functionInjector) injectFunctor(parameters []string, captures []string, body []ast.Statement) (module, unit, name string) {
-	closureName := fmt.Sprintf("%s-%s", injector.location.Unit, uuid.New().String())
-	injector.unit.Definitions = append(injector.unit.Definitions, ast.NewTemplateDefinition(closureName, parameters, captures, body, true, "", nil))
+	functorName := fmt.Sprintf("%s-%s", injector.location.Unit, uuid.New().String())
+	injector.unit.Definitions = append(injector.unit.Definitions, ast.NewTemplateDefinition(functorName, parameters, captures, body, true, "", nil))
 
-	return injector.location.Module, injector.location.Unit, closureName
+	return injector.location.Module, injector.location.Unit, functorName
 }
 
 func (injector *functionInjector) replaceFunction(name string, body []ast.Statement, internal bool, tag ast.Tag, docs string) {

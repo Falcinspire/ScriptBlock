@@ -26,6 +26,6 @@ func (visitor *RawifyValueVisitor) VisitFunction(functionValue *values.FunctionV
 func (visitor *RawifyValueVisitor) VisitTemplate(templateValue *values.TemplateValue) {
 	panic(fmt.Errorf("Cannot reduce a template reference to a value"))
 }
-func (visitor *RawifyValueVisitor) VisitFunctor(closureValue *values.FunctorValue) {
+func (visitor *RawifyValueVisitor) VisitFunctor(functorValue *values.FunctorValue) {
 	panic(fmt.Errorf("Cannot reduce a closure reference to a value"))
 }

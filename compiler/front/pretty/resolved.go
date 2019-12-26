@@ -34,16 +34,8 @@ type ResolvedTemplateDefinition struct {
 	Internal      bool
 	Documentation string
 	Parameters    []string
+	Captures      []string
 	Body          []ResolvedStatement
-}
-
-type ResolvedTemplateDefinition struct {
-	Type       string
-	Name       string
-	Internal   bool
-	Parameters []string
-	Captures   []string
-	Body       []ResolvedStatement
 }
 
 type ResolvedStatement interface{}

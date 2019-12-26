@@ -178,7 +178,7 @@ func (expression *IdentifierExpression) Accept(visitor ExpressionVisitor) {
 	visitor.VisitIdentifier(expression)
 }
 
-// FunctorExpression is any node that represents a closure expression
+// FunctorExpression is any node that represents a functor expression
 type FunctorExpression struct {
 	Callee   Expression
 	Capture  []*IdentifierExpression

@@ -14,7 +14,7 @@ type TrailingFunction struct {
 
 // FunctionCall is any node that represents a function call
 type FunctionCall struct {
-	Callee    Expression // TODO this is nearly always identifier, but can also be a closure
+	Callee    Expression // TODO this is nearly always identifier, but can also be a functor
 	Arguments []Expression
 	Trailing  *TrailingFunction
 	Metadata  *Metadata

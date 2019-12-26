@@ -130,7 +130,7 @@ func makeCaptureSet(child *freeVariableSet, depth int) []*ast.IdentifierExpressi
 	for i, enclosedVariable := range ListFreeSet(child) {
 		captures[i] = ast.NewIdentifierExpression(enclosedVariable.Name, nil)
 		captures[i].Address = symbol.NewAddressBox(symbol.PARAMETER, enclosedVariable)
-		if enclosedVariable.FunctorDepth != depth {
+		if enclosedVariable.ClosureDepth != depth {
 			captures[i].Free = true
 		} else {
 			captures[i].Free = false
@@ -140,5 +140,5 @@ func makeCaptureSet(child *freeVariableSet, depth int) []*ast.IdentifierExpressi
 }
 
 func isFree(enclosedVariable *symbol.ParameterAddress, depth int) bool {
-	return enclosedVariable.FunctorDepth != depth
+	return enclosedVariable.ClosureDepth != depth
 }

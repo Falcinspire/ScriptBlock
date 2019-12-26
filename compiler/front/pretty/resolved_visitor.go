@@ -2,7 +2,7 @@ package pretty
 
 import (
 	"github.com/falcinspire/scriptblock/compiler/ast"
-	"github.com/falcinspire/scriptblock/compiler/front/symbols"
+	"github.com/falcinspire/scriptblock/compiler/ast/symbol"
 )
 
 type ResolvedTopDefinitionVisitor struct {
@@ -23,12 +23,7 @@ func (visitor *ResolvedTopDefinitionVisitor) VisitFunctionDefinition(definition 
 
 func (visitor *ResolvedTopDefinitionVisitor) VisitTemplateDefinition(definition *ast.TemplateDefinition) {
 	body := QuickVisitBody(definition.Body)
-	visitor.Result = &ResolvedTemplateDefinition{"template", definition.Name, definition.Internal, definition.Documentation, definition.Parameters, body}
-}
-
-func (visitor *ResolvedTopDefinitionVisitor) VisitTemplateDefinition(definition *ast.TemplateDefinition) {
-	body := QuickVisitBody(definition.Body)
-	visitor.Result = &ResolvedTemplateDefinition{"closure", definition.Name, definition.Internal, definition.Parameters, definition.Capture, body}
+	visitor.Result = &ResolvedTemplateDefinition{"template", definition.Name, definition.Internal, definition.Documentation, definition.Parameters, definition.Capture, body}
 }
 
 func QuickVisitExpressionList(expressionsAst []ast.Expression, visitor *ResolvedExpressionVisitor) []ResolvedExpression {
@@ -88,16 +83,16 @@ func (visitor *ResolvedExpressionVisitor) VisitIdentifier(call *ast.IdentifierEx
 	visitor.Result = &ResolvedIdentifierExpression{"identifier", address}
 }
 
-func QuickVisitAddress(address *symbols.AddressBox) ResolvedAddress {
+func QuickVisitAddress(address *symbol.AddressBox) ResolvedAddress {
 	switch address.Type {
-	case symbols.UNIT:
-		data := address.Data.(*symbols.UnitAddress)
+	case symbol.UNIT:
+		data := address.Data.(*symbol.UnitAddress)
 		return &ResolvedUnitAddress{data.Module, data.Unit, data.Name}
-	case symbols.PARAMETER:
-		data := address.Data.(*symbols.ParameterAddress)
-		return &ResolvedParameterAddress{data.FunctorDepth, data.Name}
-	case symbols.CAPTURE:
-		data := address.Data.(*symbols.CaptureAddress)
+	case symbol.PARAMETER:
+		data := address.Data.(*symbol.ParameterAddress)
+		return &ResolvedParameterAddress{data.ClosureDepth, data.Name}
+	case symbol.CAPTURE:
+		data := address.Data.(*symbol.CaptureAddress)
 		return &ResolvedCaptureAddress{data.Name}
 	}
 

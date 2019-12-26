@@ -15,7 +15,7 @@ import (
 // git clone probably fails bc folder is not empty
 func Download(data environment.ModuleDescription) { //TODO maybe make ModuleDescription a pointer
 	home.MakeModulePath(data)
-	fmt.Println("Cloning " + "https://" + data.Location)
+	fmt.Println("Cloning " + "https://" + data.Location)                        //TODO move output to logrus
 	cmd := exec.Command("git", "clone", "https://"+data.Location, data.Version) //TODO maybe include this in input? or filter it out?
 	cmd.Dir = environment.GetAbreviatedModulePath(data)
 	err := cmd.Run()

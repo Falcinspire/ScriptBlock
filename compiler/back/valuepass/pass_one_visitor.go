@@ -39,11 +39,10 @@ func (visitor *topOneValueVisitor) VisitTemplateDefinition(definition *ast.Templ
 		"module": visitor.data.Location.Module,
 		"unit":   visitor.data.Location.Unit,
 		"name":   definition.Name,
-	}).Info("Evaluating closure reference")
+	}).Info("Evaluating template reference")
 
 	value := values.NewTemplateValue(visitor.data.Location.Module, visitor.data.Location.Unit, definition.Name)
 	var table values.ValueTable
-	//TODO closures are all internal?
 	if definition.Internal {
 		table = values.LookupValueTable(visitor.data.Location.Module, visitor.data.Location.Unit, visitor.data.ValueLibrary.Internal)
 	} else {
