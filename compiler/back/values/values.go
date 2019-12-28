@@ -38,6 +38,10 @@ func (this *StringValue) Accept(visitor ValueVisitor) {
 	visitor.VisitString(this)
 }
 
+func (value *StringValue) String() string {
+	return value.Value
+}
+
 type FunctionValue struct {
 	Module string
 	Unit   string
