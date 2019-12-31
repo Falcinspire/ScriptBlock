@@ -1,0 +1,5 @@
+name: core
+description: A test core project
+author: Falcinspire
+version: 1.0.0
+dependencies:

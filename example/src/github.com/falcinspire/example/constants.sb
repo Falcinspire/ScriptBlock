@@ -1,0 +1,7 @@
+const spawnX = 0
+const spawnY = 0
+const spawnZ = 0
+
+func print_spawnpoints {
+    command('say ', spawnX, spawnY, spawnZ)
+}

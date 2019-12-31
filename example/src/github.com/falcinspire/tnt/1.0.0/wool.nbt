@@ -1,0 +1,6 @@
+{ 
+    Item:{ 
+       id:"minecraft:red_wool",
+       Count: 1b
+    }
+ }

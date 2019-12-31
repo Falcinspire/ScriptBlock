@@ -1,0 +1,16 @@
+const x = 5
+
+func main {
+    cycleItemEffect(130)
+    cycleItemEffect(160)
+    cycleItemEffect(180)
+}
+
+/* 
+** This is documentation 
+*/
+script cycleItemEffect { (time) ->
+    command('data merge entity', x, <join>('@e[type=item,tag=Tnt,limit=1,scores={particle_Tnt=', <int>(time), '}]'), <resource>('wool.nbt'))
+    command('execute as', <join>('@e[type=item,tag=Tnt,limit=1,scores={particle_Tnt=', <int>(time), '}]'), 'at @s run particle smoke ~ ~1 ~ 0 0 0 0.01 2 normal @a')
+    command('data merge entity', <join>('@e[type=item,tag=Tnt,limit=1,scores={particle_Tnt=', <int>(time + 5), '}]'), <resource>('tnt.nbt'))
+}

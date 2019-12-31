@@ -1,4 +1,5 @@
-import predator:helper
+import 'predator:helper'
+import 'core:mc'
 
 const sub = 6
 const add = sub * 3
@@ -7,11 +8,16 @@ const add = sub * 3
 ** This is a documentation string
 */
 #minecraft:tick func do_load { 
-    command('rip')
+    command('ye')
 }
 
 func do_something {
     test_wrap(5)
+    command('say', <resource>('zombie.json'))
+}
+
+func reference_import {
+    testMessage()
 }
 
 script test_wrap { (z) ->

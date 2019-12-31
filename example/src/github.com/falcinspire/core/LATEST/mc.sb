@@ -1,0 +1,5 @@
+func testMessage {
+    command('say this is a test')
+    command('say this is a test')
+    command('say this is a test')
+}

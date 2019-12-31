@@ -1,0 +1,30 @@
+import 'github.com/falcinspire/example/constants'
+
+const thing = 6
+const mult = thing * 3 
+
+func do_something {
+    debug_message('starting test...')
+    command('summon zombie ~ ~ ~', <resource>('zombie.json'))
+    print_spawnpoints()
+    do_run()
+    debug_message('ending test...')
+}
+
+
+func do_run {
+    execute_for_many('Executing') { (a) ->  
+        command('tp', '@a', spawnX, spawnY + a, spawnZ)
+    }
+}
+
+script execute_for_many { (message, toRun) ->
+    command('say', message)
+    toRun(1)
+    toRun(2)
+    toRun(3)
+}
+
+script debug_message { (message) ->
+    command('say DEBUG:', message)
+}
