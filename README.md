@@ -10,18 +10,21 @@ This project is not yet available by executable or installer. The only option is
 ```
 git clone https://github.com/Falcinspire/ScriptBlock.git
 go install github.com/Falcinspire/scriptblock/cmd/scriptblock
+go install github.com/Falcinspire/scriptblock/cmd/scriptblock-new
 ```
 NOTE: This command sequence is untested.
 
 ## Usage
 
-If the `bin` directory of the go workspace is in the system path, then use is simple:
+`scriptblock-new` should be used to create a new project.
+
+If the `bin` directory of the go workspace is in the system path, then building is simple:
 ```
 scriptblock <project> 
 ```
 i.e.
 ```
-scriptblock github.com/Falcinspire/predator
+scriptblock github.com/Falcinspire/predator LATEST
 ```
 If the `bin` directory of the go workspace is not in the system path, use the same command as above, but with the full path to the scriptblock executable:
 ```
@@ -67,3 +70,7 @@ The output of the ScriptBlock compiler is the part of the data pack needed for f
 ## What it looks like
 
 ![Screenshot](https://github.com/Falcinspire/ScriptBlock/blob/dev/screenshot.png)
+
+## Example
+
+If the repository is cloned and the environment variable "ScriptBlockPath" is set to the repository's /example directory, then running `scriptblock github.com/Falcinspire/predator LATEST` will demonstrate the software working. 
